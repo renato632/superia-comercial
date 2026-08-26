@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SUPERIA · Inteligência Comercial</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+body{background:#0f2b25;color:#eaf3ef}
+/* HOME */
+#home{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;background:radial-gradient(1200px 600px at 50% -10%,#164034 0%,#0f2b25 60%)}
+#home h1{font-size:34px;letter-spacing:.5px;margin:0}#home h1 b{color:#57c99a}
+#home .sub{color:#9fc4b6;margin-top:10px;font-size:15px;max-width:640px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:38px;max-width:940px;width:100%}
+.card{text-align:left;background:#16382f;border:1px solid #24493d;border-radius:16px;padding:20px;cursor:pointer;color:#eaf3ef;transition:.15s;font:inherit}
+.card:hover{transform:translateY(-3px);border-color:#57c99a;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.5px;padding:3px 9px;border-radius:20px;margin-bottom:11px}
+.t25{background:#264b3f;color:#8fe0bf}.t24{background:#3a3f2a;color:#d9e08f}.t26{background:#24405a;color:#9fc7ee}.tcmp{background:#4a3a1e;color:#f0cf8f}.tpoli{background:#3a2450;color:#c9a8e6}
+.card b{display:block;font-size:18px;margin-bottom:6px}.card small{color:#9fc4b6;font-size:12.5px;line-height:1.5}
+.card .go{margin-top:13px;color:#57c99a;font-weight:700;font-size:13px}
+.foot{color:#6f9384;font-size:12px;margin-top:36px;line-height:1.6}
+/* PORTAL */
+#portal{display:none;flex-direction:column;height:100vh}
+.bar{display:flex;gap:7px;align-items:center;flex-wrap:wrap;background:#0f2b25;padding:9px 14px;border-bottom:2px solid #1f8a5b}
+.hbtn{background:transparent;color:#9fc4b6;border:1px solid #24493d;border-radius:9px;padding:8px 12px;cursor:pointer;font-size:13px;font-weight:600}
+.hbtn:hover{border-color:#57c99a;color:#eaf3ef}
+.brand{color:#eaf3ef;font-weight:700;font-size:14px;margin:0 10px 0 4px;white-space:nowrap}.brand b{color:#57c99a}
+.tab{background:#16382f;color:#cfe6db;border:1px solid #24493d;border-radius:9px;padding:8px 14px;cursor:pointer;font-size:13px;font-weight:600;transition:.12s}
+.tab:hover{border-color:#57c99a}.tab.on{background:#57c99a;color:#0f2b25;border-color:#57c99a}
+.tab.poli.on{background:#a06ccf;border-color:#a06ccf;color:#fff}.tpros{background:#5a2330;color:#f3b0bd}.tacet{background:#173f4a;color:#8fd8e0}.tab.acet.on{background:#1499a8;border-color:#1499a8;color:#fff}.tab.pros.on{background:#c0392b;border-color:#c0392b;color:#fff}.tab.cmp.on{background:#e0b34a;border-color:#e0b34a;color:#3a2d0a}
+iframe{flex:1;width:100%;border:0;background:#f4f6f8;display:block}
+</style></head><body>
+<div id="home">
+ <h1>SUPERIA · <b>Inteligência Comercial</b></h1>
+ <div class="sub">Fios &amp; Fibras — Market Share, Comparativo, Poliamida, Acetato e Prospects · Base LOGCOMEX · Uso interno</div>
+ <div class="cards">
+  <button class="card" data-src="Painel_Comparativo_2025x2026.html"><span class="tag tcmp">COMPARATIVO</span><b>Comparativo de períodos</b><small>Compare qualquer período de 2023 a 2026 (mês, trimestre, semestre, ano): share, concorrentes, NCM, traders, churn.</small><div class="go">Entrar →</div></button>
+  <button class="card" data-src="Painel_SUPERIA_Share_2026.html"><span class="tag t26">2026</span><b>Market Share 2026</b><small>Participação SUPERIA vs concorrentes, por cliente, NCM e trader — com drill de concorrentes.</small><div class="go">Entrar →</div></button>
+  <button class="card" data-src="Painel_SUPERIA_Share_2025.html"><span class="tag t25">2025</span><b>Market Share 2025</b><small>Participação SUPERIA vs concorrentes no ano completo 2025, mesma navegação do 2026.</small><div class="go">Entrar →</div></button>
+  <button class="card" data-src="Painel_SUPERIA_Share_2024.html"><span class="tag t24">2024</span><b>Market Share 2024</b><small>Participação SUPERIA vs concorrentes no ano completo 2024, mesma navegação dos demais.</small><div class="go">Entrar →</div></button>
+  <button class="card" data-src="Painel_Poliamida_Ventuno.html"><span class="tag tpoli">POLIAMIDA</span><b>Poliamida</b><small>NCM 5402.31.19: mercado, Superia, Ventuno e "não atender" (distribuidoras/marcas) e o aberto real.</small><div class="go">Entrar →</div></button>
+  <button class="card" data-src="Acetato.html"><span class="tag tacet">ACETATO</span><b>Acetato · NCM 3920.73.10</b><small>Filme de acetato (ponta de cadarço/corda de sacola de papel). Pesquisa de oportunidade: mercado, SUPERIA (0%) e alvos via nosso ex-fornecedor Tyan Kuei.</small><div class="go">Entrar →</div></button>
+  <button class="card" data-src="Prospect.html"><span class="tag tpros">PROSPECT</span><b>Novo Trader · Prospect</b><small>Clientes que a SUPERIA <b>não atende</b> (zero volume Superia) — carteira potencial de um novo trader, por UF, NCM e concorrente.</small><div class="go">Entrar →</div></button>
+ </div>
+ <div class="foot">Documento confidencial — SUPERIA Comercial Internacional. Compartilhar apenas internamente.</div>
+</div>
+<div id="portal">
+ <div class="bar">
+  <button class="hbtn" id="homeBtn">← Início</button>
+  <span class="brand">SUPERIA · <b>IC</b></span>
+  <button class="tab cmp" data-src="Painel_Comparativo_2025x2026.html">Comparativo</button>
+  <button class="tab" data-src="Painel_SUPERIA_Share_2026.html">Share 2026</button>
+  <button class="tab" data-src="Painel_SUPERIA_Share_2025.html">Share 2025</button>
+  <button class="tab" data-src="Painel_SUPERIA_Share_2024.html">Share 2024</button>
+  <button class="tab poli" data-src="Painel_Poliamida_Ventuno.html">Poliamida</button>
+  <button class="tab acet" data-src="Acetato.html">Acetato</button>
+  <button class="tab pros" data-src="Prospect.html">Novo Trader (Prospect)</button>
+ </div>
+ <iframe id="fr" title="painel"></iframe>
+</div>
+<script>
+const home=document.getElementById('home'),portal=document.getElementById('portal'),fr=document.getElementById('fr'),tabs=[...document.querySelectorAll('.tab')];
+function go(src){fr.src=src;tabs.forEach(t=>t.classList.toggle('on',t.dataset.src===src));try{localStorage.setItem('superia_portal_tab',src)}catch(e){}}
+function enter(src){home.style.display='none';portal.style.display='flex';go(src);}
+function goHome(){portal.style.display='none';home.style.display='flex';}
+document.querySelectorAll('.card').forEach(c=>c.onclick=()=>enter(c.dataset.src));
+tabs.forEach(t=>t.onclick=()=>go(t.dataset.src));
+document.getElementById('homeBtn').onclick=goHome;
+</script></body></html>
