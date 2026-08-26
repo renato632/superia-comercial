@@ -54,7 +54,7 @@ tr:hover td{background:#fcfcfd}
 <body>
 <header>
   <h1>SUPERIA · Carteira Potencial de um Novo Trader</h1>
-  <div class="sub">Clientes que a SUPERIA <b>não atende</b> (prospects · zero volume Superia) · Fonte LOGCOMEX · <span id="per"></span> · unidade: kg · 1 container (ctnr) = 24.000 kg</div>
+  <div class="sub">Clientes que a SUPERIA <b>não atende</b> (prospects · zero volume Superia) · Fonte LOGCOMEX · <span id="per"></span> · unidade: t · 1 container (ctnr) = 24 t</div>
 </header>
 <div class="wrap">
   <div class="bar">
@@ -76,7 +76,7 @@ tr:hover td{background:#fcfcfd}
         <th data-k="city">Cidade</th>
         <th data-k="uf">UF</th>
         <th data-k="st">Status</th>
-        <th data-k="kg" class="n">Vol. 12m (kg)</th>
+        <th data-k="kg" class="n">Vol. 12m (t)</th>
         <th data-k="ctnr" class="n">ctnr</th>
         <th data-k="_ncm">NCMs (linhas)</th>
         <th data-k="_cmp">Principais concorrentes (fornecedor)</th>
@@ -134,9 +134,9 @@ function render(){
   const ncmOn=SEL.ncm.size>0;
   document.getElementById('sums').innerHTML=
     `<div class="sumc"><div class="l">Clientes no filtro</div><div class="v">${fmt(r.length)}</div><div class="d">de ${fmt(D.n)} prospects</div></div>`+
-    `<div class="sumc"><div class="l">${ncmOn?'Volume na(s) NCM(s) (kg)':'Mercado (kg)'}</div><div class="v">${fmt(tot)}</div><div class="d">${ncmOn?'ajustado à(s) NCM(s) selecionada(s)':'volume 12 meses não atendido'}</div></div>`+
-    `<div class="sumc"><div class="l">Containers (ctnr)</div><div class="v red">${fmt(ctnr)}</div><div class="d">1 ctnr = 24.000 kg</div></div>`+
-    `<div class="sumc"><div class="l">Média por cliente</div><div class="v">${fmt(avg)}</div><div class="d">kg / cliente (${(avg/24000).toFixed(1).replace('.',',')} ctnr)</div></div>`;
+    `<div class="sumc"><div class="l">${ncmOn?'Volume na(s) NCM(s) (t)':'Mercado (t)'}</div><div class="v">${fmt(tot)}</div><div class="d">${ncmOn?'ajustado à(s) NCM(s) selecionada(s)':'volume 12 meses não atendido'}</div></div>`+
+    `<div class="sumc"><div class="l">Containers (ctnr)</div><div class="v red">${fmt(ctnr)}</div><div class="d">1 ctnr = 24 t</div></div>`+
+    `<div class="sumc"><div class="l">Média por cliente</div><div class="v">${fmt(avg)}</div><div class="d">t / cliente (${(avg/24000).toFixed(1).replace('.',',')} ctnr)</div></div>`;
   const tb=document.getElementById('tb');
   tb.innerHTML=r.map((o,i)=>{const x=o.x,vol=o.vol,ns=effNcms(x);return `<tr>
     <td class="rank">${i+1}</td>
@@ -146,10 +146,10 @@ function render(){
     <td><span class="st">${x.st}</span></td>
     <td class="n">${fmt(vol)}</td>
     <td class="n">${fmt(vol/24000)}</td>
-    <td>${ns.slice(0,4).map(n=>`<span class="tag">${n[0].replace(/ \(\d+\)/,'')} · ${fmt(n[1])}kg</span>`).join('')}${ns.length>4?'<span class="tag">+'+(ns.length-4)+'</span>':''}</td>
+    <td>${ns.slice(0,4).map(n=>`<span class="tag">${n[0].replace(/ \(\d+\)/,'')} · ${fmt(Math.round(n[1]/1000))}t</span>`).join('')}${ns.length>4?'<span class="tag">+'+(ns.length-4)+'</span>':''}</td>
     <td class="cmp">${x.exp.slice(0,3).map(e=>e[0]).join(' · ')||'—'}</td>
   </tr>`;}).join('');
-  document.getElementById('foot').innerHTML=`Mostrando <b>${fmt(r.length)}</b> clientes · Total <b>${fmt(tot)} kg</b> ≈ <b>${fmt(ctnr)} ctnr</b>${ncmOn?' <b>(somente a(s) NCM(s) selecionada(s))</b>':''}. &nbsp;|&nbsp; Status "Não Superia (prospect)" = importadores sem nenhum volume fornecido pela SUPERIA na janela. Cliente = Notificado quando informado, senão Provável Importador. Excluídos totalmente da conta: HYOSUNG, VENTUNO, UNIFI, HUVISPAN (produtores/concorrentes). <b>Regra Poliamida (NCM 5402.31.19):</b> o volume de poliamida foi <b>desconsiderado</b> para clientes que não podemos atender em poliamida (carteira Ventuno/Superia e distribuidoras) — as demais NCMs desses clientes permanecem, pois podem ser prospectadas.`;
+  document.getElementById('foot').innerHTML=`Mostrando <b>${fmt(r.length)}</b> clientes · Total <b>${fmt(Math.round(tot/1000))} t</b> ≈ <b>${fmt(ctnr)} ctnr</b>${ncmOn?' <b>(somente a(s) NCM(s) selecionada(s))</b>':''}. &nbsp;|&nbsp; Status "Não Superia (prospect)" = importadores sem nenhum volume fornecido pela SUPERIA na janela. Cliente = Notificado quando informado, senão Provável Importador. Excluídos totalmente da conta: HYOSUNG, VENTUNO, UNIFI, HUVISPAN (produtores/concorrentes). <b>Regra Poliamida (NCM 5402.31.19):</b> o volume de poliamida foi <b>desconsiderado</b> para clientes que não podemos atender em poliamida (carteira Ventuno/Superia e distribuidoras) — as demais NCMs desses clientes permanecem, pois podem ser prospectadas.`;
 }
 document.querySelectorAll('th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(k.startsWith('_'))return;if(sK===k)sD=-sD;else{sK=k;sD=(k==='c'||k==='city'||k==='uf'||k==='st')?1:-1;}render();});
 document.getElementById('q').oninput=render;
@@ -157,7 +157,7 @@ document.getElementById('clr').onclick=()=>{Object.values(SEL).forEach(s=>s.clea
 document.getElementById('xls').onclick=()=>{
   const ncmOn=SEL.ncm.size>0;
   const r=filtered().map(x=>({x,vol:effKg(x)})).sort((a,b)=>b.vol-a.vol);
-  const aoa=[['#','Cliente','Cidade','UF','Status',ncmOn?'Vol NCM selec. (kg)':'Vol 12m (kg)','ctnr','NCMs (linhas)','Poliamida desconsiderada','Principais concorrentes']];
+  const aoa=[['#','Cliente','Cidade','UF','Status',ncmOn?'Vol NCM selec. (t)':'Vol 12m (t)','ctnr','NCMs (linhas)','Poliamida desconsiderada','Principais concorrentes']];
   r.forEach((o,i)=>{const x=o.x,vol=o.vol,ns=effNcms(x);aoa.push([i+1,x.c,x.city,x.uf,x.st,Math.round(vol),Math.round(vol/24000),ns.map(n=>n[0]).join(' | '),x.polB?'Sim':'Não',x.exp.map(e=>e[0]).join(' | ')]);});
   const ws=XLSX.utils.aoa_to_sheet(aoa);
   ws['!cols']=[{wch:5},{wch:44},{wch:18},{wch:5},{wch:22},{wch:14},{wch:8},{wch:40},{wch:12},{wch:44}];
