@@ -134,9 +134,9 @@ function render(){
   const ncmOn=SEL.ncm.size>0;
   document.getElementById('sums').innerHTML=
     `<div class="sumc"><div class="l">Clientes no filtro</div><div class="v">${fmt(r.length)}</div><div class="d">de ${fmt(D.n)} prospects</div></div>`+
-    `<div class="sumc"><div class="l">${ncmOn?'Volume na(s) NCM(s) (t)':'Mercado (t)'}</div><div class="v">${fmt(tot)}</div><div class="d">${ncmOn?'ajustado à(s) NCM(s) selecionada(s)':'volume 12 meses não atendido'}</div></div>`+
+    `<div class="sumc"><div class="l">${ncmOn?'Volume na(s) NCM(s) (t)':'Mercado (t)'}</div><div class="v">${fmt(Math.round(tot/1000))}</div><div class="d">${ncmOn?'ajustado à(s) NCM(s) selecionada(s)':'volume 12 meses não atendido'}</div></div>`+
     `<div class="sumc"><div class="l">Containers (ctnr)</div><div class="v red">${fmt(ctnr)}</div><div class="d">1 ctnr = 24 t</div></div>`+
-    `<div class="sumc"><div class="l">Média por cliente</div><div class="v">${fmt(avg)}</div><div class="d">t / cliente (${(avg/24000).toFixed(1).replace('.',',')} ctnr)</div></div>`;
+    `<div class="sumc"><div class="l">Média por cliente</div><div class="v">${fmt(Math.round(avg/1000))}</div><div class="d">t / cliente (${(avg/24000).toFixed(1).replace('.',',')} ctnr)</div></div>`;
   const tb=document.getElementById('tb');
   tb.innerHTML=r.map((o,i)=>{const x=o.x,vol=o.vol,ns=effNcms(x);return `<tr>
     <td class="rank">${i+1}</td>
@@ -144,7 +144,7 @@ function render(){
     <td>${x.city||'—'}</td>
     <td>${x.uf||'—'}</td>
     <td><span class="st">${x.st}</span></td>
-    <td class="n">${fmt(vol)}</td>
+    <td class="n">${fmt(Math.round(vol/1000))}</td>
     <td class="n">${fmt(vol/24000)}</td>
     <td>${ns.slice(0,4).map(n=>`<span class="tag">${n[0].replace(/ \(\d+\)/,'')} · ${fmt(Math.round(n[1]/1000))}t</span>`).join('')}${ns.length>4?'<span class="tag">+'+(ns.length-4)+'</span>':''}</td>
     <td class="cmp">${x.exp.slice(0,3).map(e=>e[0]).join(' · ')||'—'}</td>
