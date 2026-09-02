@@ -1,0 +1,153 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SUPERIA · Placar do Juan</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f4f6f8;color:#1d2733;padding:24px;max-width:1200px;margin:0 auto}
+.hd{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;border-bottom:3px solid #1f8a5b;padding-bottom:12px}
+h1{font-size:22px;color:#12433a}h1 b{color:#1f8a5b}
+.sub{font-size:12px;color:#6b7680;margin-top:4px;max-width:720px;line-height:1.45}
+h2{font-size:13px;color:#41505e;text-transform:uppercase;letter-spacing:.6px;margin:22px 0 10px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:16px}
+.kpi{background:#fff;border:1px solid #e3e8ec;border-radius:12px;padding:14px}
+.kpi .l{font-size:11px;color:#8a95a0;text-transform:uppercase;letter-spacing:.4px}
+.kpi .v{font-size:24px;font-weight:800;color:#12433a;margin-top:4px}.kpi .v.g{color:#1f8a5b}
+.kpi .s{font-size:11px;color:#6b7680;margin-top:2px}
+.card{background:#fff;border:1px solid #e3e8ec;border-radius:14px;padding:14px;margin-top:6px}
+.goalrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:13px;margin-bottom:6px}
+.goalrow input[type=date],.goalrow input[type=number]{padding:6px 8px;border:1px solid #cfd8de;border-radius:8px;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid #eef2f5;vertical-align:top}
+th{background:#12433a;color:#fff;font-weight:600;font-size:11px;position:sticky;top:0}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.tot td{font-weight:800;background:#f0f5f2;border-top:2px solid #1f8a5b}
+.tw{overflow:auto;border:1px solid #e3e8ec;border-radius:12px;max-height:640px}
+select.st,input.ct,input.dt,input.nt{border:1px solid #cfd8de;border-radius:7px;padding:5px 7px;font-size:12px;font-family:inherit}
+input.nt{width:150px}input.ct{width:64px;text-align:right}
+.badge{padding:2px 8px;border-radius:20px;font-size:11px;font-weight:800;white-space:nowrap}
+.b0{background:#eef2f5;color:#6b7680}.b1{background:#e7f0fb;color:#2b6cb0}.b2{background:#fff4e0;color:#9a6b12}
+.b3{background:#efe6fb;color:#7a45c2}.b4{background:#e3f5ea;color:#12724e}.b5{background:#fbe4e4;color:#c0392b}
+.funnel{display:flex;flex-direction:column;gap:5px}
+.fbar{display:flex;align-items:center;gap:8px;font-size:12.5px}
+.fbar .track{flex:1;height:20px;background:#eef2f5;border-radius:6px;overflow:hidden}.fbar .track>i{display:block;height:100%;background:#1f8a5b}
+.fbar .lab{width:130px;font-weight:700}.fbar .cnt{width:44px;text-align:right;font-weight:800}
+.chip{font-size:10.5px;background:#eef2f5;border-radius:12px;padding:2px 7px;color:#41505e;display:inline-block;margin:1px}
+.ctrls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.ctrls input,.ctrls select{padding:7px 9px;border:1px solid #cfd8de;border-radius:8px;font-size:13px}
+.btn{background:#1f8a5b;color:#fff;border:0;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer}
+.btn.sec{background:#eef2f5;color:#12433a;border:1px solid #d7dee3}
+.prog{height:12px;background:#eef2f5;border-radius:6px;overflow:hidden;margin-top:4px}.prog>i{display:block;height:100%;background:#1f8a5b}
+.note{font-size:11px;color:#8a95a0;margin-top:10px;line-height:1.5}
+.saved{font-size:11px;color:#1f8a5b;font-weight:700}
+</style></head><body>
+<div class="hd">
+  <div><h1>SUPERIA · <b>Placar do Trader Juan</b> — Prospecção</h1>
+  <div class="sub">Carteira de prospecção direcionada ao novo trader. O Juan atualiza o status na tela (salva neste navegador) e baixa em Excel para o gestor consolidar. Base LOGCOMEX · volumes em toneladas · 1 contêiner = 25,4 t.</div></div>
+  <div style="text-align:right"><div class="saved" id="savedTag">salvo automaticamente</div><div style="font-size:11px;color:#8a95a0">Início da prospecção: <input type="date" id="startDate"></div></div>
+</div>
+
+<div class="kpis" id="kpis"></div>
+
+<h2>Metas 30 / 60 / 90 dias</h2>
+<div class="card">
+  <div class="goalrow">Metas (clientes ganhos): 30d <input type="number" id="g30c" min="0" style="width:60px"> · 60d <input type="number" id="g60c" style="width:60px"> · 90d <input type="number" id="g90c" style="width:60px"> &nbsp;|&nbsp; Metas (contêineres): 30d <input type="number" id="g30t" style="width:60px"> · 60d <input type="number" id="g60t" style="width:60px"> · 90d <input type="number" id="g90t" style="width:60px"></div>
+  <div class="tw" style="max-height:none"><table id="tGoals"><thead><tr><th>Marco</th><th class="n">Meta clientes</th><th class="n">Ganhos (real)</th><th class="n">% clientes</th><th class="n">Meta ctnr</th><th class="n">Ctnr fechados</th><th class="n">% ctnr</th></tr></thead><tbody></tbody></table></div>
+</div>
+
+<h2>Funil de prospecção</h2>
+<div class="card"><div class="funnel" id="funnel"></div></div>
+
+<h2>Alvos priorizados — 67 clientes do Juan</h2>
+<div class="ctrls">
+  <input id="q" placeholder="Buscar cliente...">
+  <select id="fUf"><option value="">UF (todas)</option></select>
+  <select id="fSt"><option value="">Status (todos)</option></select>
+  <button class="btn" id="xls">⬇ Baixar Excel</button>
+  <button class="btn sec" id="bkp">Backup (JSON)</button>
+  <label class="btn sec" style="cursor:pointer">Importar<input type="file" id="imp" accept=".json" style="display:none"></label>
+  <span class="note" id="cnt" style="margin:0"></span>
+</div>
+<div class="tw"><table id="tAlvos"><thead><tr>
+  <th>#</th><th>Cliente</th><th>UF</th><th class="n">Potencial (t)</th><th class="n">ctnr</th><th>NCMs-alvo</th><th>Concorrente a deslocar</th><th>Status</th><th class="n">Ctnr fechados</th><th>Data</th><th>Notas</th>
+</tr></thead><tbody></tbody></table></div>
+
+<div class="note">Como usar: o Juan seleciona o <b>Status</b>, informa <b>Ctnr fechados</b> quando ganha a conta, a <b>Data</b> e <b>Notas</b>. Tudo salva automaticamente neste navegador. Ao final do dia/semana, clica em <b>Baixar Excel</b> e envia ao gestor. Conteúdo confidencial (cliente/concorrente) — uso interno.</div>
+
+<script>
+const DATA=[{"c": "ARTECA INDUSTRIAL TEXTIL S.A", "uf": "MG", "city": "PEDRO LEOPOLDO", "pot": 4197, "ctnr": 165, "ncms": ["PV Ring / MVS (55095100)", "Poliéster PTY Cru (54023310)", "Poliamida (54023119)"], "comp": "TEXPORTO HONG KONG"}, {"c": "BRUSFIOS COMERCIO IMPORTACAO E EXPORTACAO LTDA", "uf": "SC", "city": "BRUSQUE", "pot": 3224, "ctnr": 127, "ncms": ["Poliéster PTY Cru (54023310)", "Poliamida (54023119)", "PP Ring / MVS (55092100)"], "comp": "BE CHOSE TRADING UNITED STATES"}, {"c": "BRANYL COMERCIO E INDUSTRIA TEXTIL LTDA", "uf": "SP", "city": "CAPIVARI", "pot": 3075, "ctnr": 121, "ncms": ["Poliéster FDY (54024710)", "Poliéster PTY Cru (54023310)", "Poliéster FDY Preto (54024720)"], "comp": "ZHEJIANG HENGYI CHINA"}, {"c": "JRC COMERCIAL LTDA", "uf": "SC", "city": "BLUMENAU", "pot": 3055, "ctnr": 120, "ncms": ["Polipropileno (54024800)", "Fibra Poliéster (55032090)", "Poliéster PTY Cru (54023310)"], "comp": "GUANGDONG XINQIANGDE CHINA"}, {"c": "COMERCIAL TEXTIL SUL BRASIL LTDA", "uf": "SC", "city": "INDAIAL", "pot": 2945, "ctnr": 116, "ncms": ["Poliéster PTY Cru (54023310)", "Poliamida (54023119)", "PC / PA (55095300)"], "comp": "LANDI HONG KONG"}, {"c": "VICUNHA TEXTIL S/A.", "uf": "CE", "city": "MARACANAÚ", "pot": 2540, "ctnr": 100, "ncms": ["PC / PA (5205) (52051200)", "Poliéster PTY Cru (54023310)", "PV Ring / MVS (55095100)"], "comp": "VICUNHA ARGENTINA"}, {"c": "HEDRONS TEXTIL LTDA", "uf": "SC", "city": "DOUTOR PEDRINHO", "pot": 2527, "ctnr": 99, "ncms": ["Fibra Poliéster (55032090)", "PC / PA (55095300)", "Poliéster PTY Cru (54023310)"], "comp": "WINTHETEX SOUTH KOREA"}, {"c": "NANETE TEXTIL LTDA", "uf": "SC", "city": "JARAGUÁ DO SUL", "pot": 2159, "ctnr": 85, "ncms": ["Viscose Ring/MVS/OE (55101111)", "Poliéster PTY Cru (54023310)", "Poliamida (54023119)"], "comp": "PT ELEGANT TEXTILE INDUSTRY INDONESIA"}, {"c": "AVIAMENTOS BRUSQUE LTDA", "uf": "SC", "city": "BRUSQUE", "pot": 1834, "ctnr": 72, "ncms": ["Poliéster Retorcido (55092200)", "Poliéster PTY Cru (54023310)", "Poliéster PTY DDB (54023320)"], "comp": "RMD MANUFACTURING CHINA"}, {"c": "AUNDE BRASIL S.A.", "uf": "SP", "city": "POÁ", "pot": 1764, "ctnr": 69, "ncms": ["Poliéster PTY Cru (54023310)", "Poliéster FDY (54024710)", "POY RW (54024600)"], "comp": "SUZHOU SHENGHONG CHINA"}, {"c": "LEXMAR INDUSTRIA E COMERCIO DE MALHAS LTDA", "uf": "RJ", "city": "PETRÓPOLIS", "pot": 1690, "ctnr": 67, "ncms": ["PP Ring / MVS (55092100)", "Poliéster PTY Cru (54023310)", "Poliéster PTY DDB (54023320)"], "comp": "TEXPORTO HONG KONG"}, {"c": "DASS SUL CALCADOS E ARTIGOS ESPORTIVOS LTDA", "uf": "SC", "city": "SAUDADES", "pot": 1670, "ctnr": 66, "ncms": ["Poliéster PTY Cru (54023310)", "Poliamida (54023119)", "Poliéster FDY (54024710)"], "comp": "JIANGSU REBORN CHINA"}, {"c": "C C FIOS INDUSTRIA E COMERCIO DE FIOS LTDA", "uf": "SC", "city": "BOTUVERÁ", "pot": 1572, "ctnr": 62, "ncms": ["Poliéster Retorcido (55092200)", "Poliéster PTY Cru (54023310)", "Poliéster PTY DDB (54023320)"], "comp": "RMD MANUFACTURING CHINA"}, {"c": "SANCRIS LINHAS E FIOS LTDA", "uf": "SC", "city": "BRUSQUE", "pot": 1566, "ctnr": 62, "ncms": ["Poliéster Retorcido (55092200)", "Poliéster PTY DDB (54023320)", "Poliéster PTY Cru (54023310)"], "comp": "RIO INDUSTRIES SOUTH KOREA"}, {"c": "PETTENATI SA INDUSTRIA TEXTIL", "uf": "RS", "city": "CAXIAS DO SUL", "pot": 1442, "ctnr": 57, "ncms": ["Poliéster PTY Cru (54023310)", "Poliamida (54023119)", "Viscose Ring/MVS/OE (55101111)"], "comp": "SUZHOU SHENGHONG CHINA"}, {"c": "COLORFLEX ESTAMPARIA LTDA", "uf": "SP", "city": "NOVA ODESSA", "pot": 1380, "ctnr": 54, "ncms": ["Poliéster PTY Cru (54023310)", "Poliéster PTY DDB (54023320)", "PP Ring / MVS (55092100)"], "comp": "MEGATEX BUSINESS VIRGIN ISLANDS (UK)"}, {"c": "ARTECA NORDESTE COMERCIAL LTDA", "uf": "PE", "city": "CARUARU", "pot": 1337, "ctnr": 53, "ncms": ["Poliéster PTY Cru (54023310)", "PP Ring / MVS (55092100)", "Poliamida (54023119)"], "comp": "TEXPORTO HONG KONG"}, {"c": "COMERCIAL FERREIRA COMERCIO DE TECIDOS E MALHAS LTDA", "uf": "SC", "city": "BLUMENAU", "pot": 1323, "ctnr": 52, "ncms": ["Poliéster PTY Cru (54023310)", "Poliéster PTY DDB (54023320)", "PC / PA (55095300)"], "comp": "ALX TRADING UNITED STATES"}, {"c": "ARADEFE INDUSTRIA E COMERCIO DE MALHAS LTDA", "uf": "SC", "city": "BRUSQUE", "pot": 1320, "ctnr": 52, "ncms": ["PC / PA (55095300)", "Poliéster PTY Cru (54023310)", "PV Ring / MVS (55095100)"], "comp": "RIOS TRADING HONG KONG"}, {"c": "MOMENTUS INDUSTRIA E COMERCIO DO VESTUARIO LTDA.", "uf": "SC", "city": "BRUSQUE", "pot": 1242, "ctnr": 49, "ncms": ["PC / PA (55095300)", "Algodão Pent. 5205.23 (52052310)", "Poliéster PTY Cru (54023310)"], "comp": "RIOS TRADING HONG KONG"}, {"c": "CLECIA CRISTINA DE SIQUEIRA MOREIRA LTDA", "uf": "PE", "city": "SANTA CRUZ DO CAPIBARIBE", "pot": 1100, "ctnr": 43, "ncms": ["Poliéster PTY Cru (54023310)", "Poliéster PTY DDB (54023320)", "Fibra Poliéster (55032090)"], "comp": "ALX TRADING UNITED STATES"}, {"c": "KOREA TEXTIL INDUSTRIA E COMERCIO LTDA.", "uf": "SC", "city": "SÃO JOSÉ", "pot": 1046, "ctnr": 41, "ncms": ["PC / PA (55095300)", "POY RW (54024600)", "PP Ring / MVS (55092100)"], "comp": "SHAOXING KEQIAO CHINA"}, {"c": "BELLA & CO. LTDA", "uf": "SC", "city": "BLUMENAU", "pot": 1043, "ctnr": 41, "ncms": ["Poliéster PTY DDB (54023320)", "Poliéster PTY Cru (54023310)", "PC / PA (55095300)"], "comp": "ZHEJIANG HUILONG CHINA"}, {"c": "LINHAS NICE LTDA", "uf": "SC", "city": "ITAJAÍ", "pot": 950, "ctnr": 37, "ncms": ["POY RW (54024600)", "PC / PA (55095300)", "Fibra Poliéster (55032090)"], "comp": "TEXPORTO HONG KONG"}, {"c": "TC TEXTIL INDUSTRIA E COMERCIO LTDA", "uf": "BA", "city": "FEIRA DE SANTANA", "pot": 927, "ctnr": 36, "ncms": ["Poliéster PTY Cru (54023310)", "PP Ring / MVS (55092100)", "PV Ring / MVS (55095100)"], "comp": "KCTEX SINGAPORE"}, {"c": "ATUAL TEXTIL COMERCIO E INDUSTRIA DE TECIDOS LTDA", "uf": "SE", "city": "ESTÂNCIA", "pot": 908, "ctnr": 36, "ncms": ["PP Ring / MVS (55092100)", "Poliéster PTY Cru (54023310)"], "comp": "TEXPORTO HONG KONG"}, {"c": "SALTORELLI JEANSWEAR LTDA", "uf": "SC", "city": "ITAJAÍ", "pot": 898, "ctnr": 35, "ncms": ["Poliéster PTY Cru (54023310)", "PC / PA (5205) (52051200)", "Poliéster PTY DDB (54023320)"], "comp": "HANGZHOU CHEN CHINA"}, {"c": "TEXPA LTDA", "uf": "SC", "city": "BLUMENAU", "pot": 878, "ctnr": 35, "ncms": ["Algodão Pent. 5205.23 (52052310)", "PP Ring / MVS (55092100)", "Poliéster PTY Cru (54023310)"], "comp": "LPR TRADING HONG KONG"}, {"c": "MHC INDUSTRIA TEXTIL LTDA", "uf": "SC", "city": "BRUSQUE", "pot": 857, "ctnr": 34, "ncms": ["Poliéster PTY Cru (54023310)"], "comp": "KCTEX SINGAPORE"}, {"c": "DETALLIA FITAS TEXTEIS LTDA", "uf": "SP", "city": "NOVA ODESSA", "pot": 839, "ctnr": 33, "ncms": ["Poliéster FDY (54024710)", "Poliéster PTY Cru (54023310)"], "comp": "GOLDEN VICTORY SINGAPORE"}, {"c": "DELFA INDUSTRIA E COM.DE ACESSORIOS DO VESTUARIO LTDA", "uf": "CE", "city": "MARACANAÚ", "pot": 803, "ctnr": 32, "ncms": ["Poliéster PTY Cru (54023310)", "Poliamida (54023119)"], "comp": "ZHEJIANG HENGYI CHINA"}, {"c": "BIANCA MALHAS, FIOS E TECIDOS LTDA", "uf": "MG", "city": "JACUTINGA", "pot": 795, "ctnr": 31, "ncms": ["Poliéster Retorcido (55092200)", "PP Ring / MVS (55092100)", "Viscose Ring/MVS/OE (55101111)"], "comp": "LANXI SHUANGJIAO CHINA"}, {"c": "IMPORTADORA EXPORTADORA E INDUSTRIA JIMMY LTDA", "uf": "SC", "city": "ITAJAÍ", "pot": 744, "ctnr": 29, "ncms": ["Polipropileno (54024800)", "PC / PA (55095300)", "Poliéster PTY DDB (54023320)"], "comp": "INTERCONTINENTAL MERCHANDISING HONG KONG"}, {"c": "GOLAPU FASHION INDUSTRIA E COMERCIO LTDA", "uf": "SP", "city": "GUARULHOS", "pot": 738, "ctnr": 29, "ncms": ["Poliéster PTY Cru (54023310)", "Poliéster FDY (54024710)"], "comp": "XINFENGMING JIANGSU CHINA"}, {"c": "KALINA INDUSTRIA DE FIOS E LINHAS S.A.", "uf": "SC", "city": "BRUSQUE", "pot": 734, "ctnr": 29, "ncms": ["Poliéster Retorcido (55092200)", "Poliéster PTY Cru (54023310)", "Poliamida 5402.31.11 (54023111)"], "comp": "SARLA PERFORMANCE INDIA"}, {"c": "MALWEE MALHAS LTDA", "uf": "SC", "city": "JARAGUÁ DO SUL", "pot": 707, "ctnr": 28, "ncms": ["Viscose Ring/MVS/OE (55101111)"], "comp": "MALLANA ASIA SINGAPORE"}, {"c": "DASS NORDESTE CALCADOS E ARTIGOS ESPORTIVOS S.A", "uf": "BA", "city": "VITÓRIA DA CONQUISTA", "pot": 695, "ctnr": 27, "ncms": ["Poliéster PTY Cru (54023310)"], "comp": "JIANGSU REBORN CHINA"}, {"c": "MUNDIAL TEXTIL LTDA", "uf": "SC", "city": "TANGARÁ", "pot": 633, "ctnr": 25, "ncms": ["PV Ring / MVS (55095100)", "Poliéster PTY Cru (54023310)", "Algodão Pent. 5205.23 (52052310)"], "comp": "RIOS TRADING HONG KONG"}, {"c": "TWILTEX INDUSTRIAS TEXTEIS S/A.", "uf": "SC", "city": "ITAJAÍ", "pot": 607, "ctnr": 24, "ncms": ["POY RW (54024600)", "Poliéster PTY DDB (54023320)", "Poliéster FDY (54024710)"], "comp": "SUPREME GLOBAL SINGAPORE"}, {"c": "CTB COMPANHIA TEXTIL DO BRASIL LTDA", "uf": "CE", "city": "AQUIRAZ", "pot": 597, "ctnr": 24, "ncms": ["Poliéster Retorcido (55092200)", "Poliéster PTY DDB (54023320)", "Poliéster PTY Cru (54023310)"], "comp": "PREMIUM TEXTILES HONG KONG"}, {"c": "SOFTFIOS COMERCIO, IMPORTACAO E EXPORTACAO DE FIOS LTDA", "uf": "MG", "city": "JACUTINGA", "pot": 556, "ctnr": 22, "ncms": ["PC / PA (55095300)", "Poliéster Retorcido (55092200)"], "comp": "BIG TREE HONG KONG"}, {"c": "TECH TRADING SOLUCAO TEXTIL LTDA", "uf": "SC", "city": "SÃO JOSÉ", "pot": 521, "ctnr": 20, "ncms": ["Poliéster PTY Cru (54023310)", "Poliamida (54023119)", "Poliéster PTY DDB (54023320)"], "comp": "ANT TRADING UNITED STATES"}, {"c": "FIACAO E TECELAGEM GAUCHA LTDA", "uf": "RS", "city": "NOVA SANTA RITA", "pot": 500, "ctnr": 20, "ncms": ["PV Ring / MVS (55095100)", "Poliéster PTY Cru (54023310)"], "comp": "LPR TRADING HONG KONG"}, {"c": "ELASTICOS BLUFITEX LTDA", "uf": "SC", "city": "ITAJAÍ", "pot": 453, "ctnr": 18, "ncms": ["Poliéster PTY DDB (54023320)", "Poliéster PTY Cru (54023310)", "Poliéster PTY 2X (54023390)"], "comp": "ZHUJI BAITI CHINA"}, {"c": "KIT'S ELASTICOS LTDA", "uf": "PE", "city": "SANTA CRUZ DO CAPIBARIBE", "pot": 446, "ctnr": 18, "ncms": ["Poliéster PTY Cru (54023310)", "Poliéster PTY DDB (54023320)", "Poliéster Retorcido (55092200)"], "comp": "SUPREME GLOBAL SINGAPORE"}, {"c": "RR MALHAS E TECIDOS LTDA.", "uf": "SC", "city": "ITAJAÍ", "pot": 420, "ctnr": 17, "ncms": ["PV Ring / MVS (55095100)", "PC / PA (55095300)", "Poliéster PTY Cru (54023310)"], "comp": "XUZHOU PUREFIBER CHINA"}, {"c": "COMERCIAL TEXTIL LTDA", "uf": "MG", "city": "BORDA DA MATA", "pot": 415, "ctnr": 16, "ncms": ["PC / PA (55095300)"], "comp": "WENZHOU GUFUYOU CHINA"}, {"c": "INDUSTRIA E COMERCIO DE MALHAS MH LTDA.", "uf": "SC", "city": "POMERODE", "pot": 411, "ctnr": 16, "ncms": ["Poliéster PTY Cru (54023310)", "Poliéster PTY DDB (54023320)", "Viscose Ring/MVS/OE (55101111)"], "comp": "LANDI HONG KONG"}, {"c": "DAE IL UNIGRAN TEXTIL LTDA", "uf": "SC", "city": "ITAJAÍ", "pot": 367, "ctnr": 14, "ncms": ["Poliéster PTY Cru (54023310)"], "comp": "HUZHOU ZHONGLEI CHINA"}, {"c": "ITEMA INDUSTRIA DE TECIDOS DE MALHA LTDA", "uf": "SC", "city": "FLORIANÓPOLIS", "pot": 342, "ctnr": 13, "ncms": ["Poliéster PTY Cru (54023310)", "PC / PA (55095300)"], "comp": "XINFENGMING CHINA"}, {"c": "SOBERANO INDUSTRIA DE BARBANTES LTDA", "uf": "SP", "city": "BATATAIS", "pot": 338, "ctnr": 13, "ncms": ["PC / PA (55095300)"], "comp": "CAI KINGDOM CHINA"}, {"c": "CAIMAN INDUSTRIA E COMERCIO DE MALHAS LTDA", "uf": "SC", "city": "SCHROEDER", "pot": 337, "ctnr": 13, "ncms": ["Poliéster PTY Cru (54023310)", "Algodão Pent. 5205.23 (52052310)", "Algodão Pent. 5205.22 (52052200)"], "comp": "TEXPORTO HONG KONG"}, {"c": "ALIANCA TEXTIL LTDA.", "uf": "MG", "city": "PEQUERI", "pot": 328, "ctnr": 13, "ncms": ["Poliéster PTY DDB (54023320)", "Elastano (54024400)"], "comp": "HANGZHOU KAILI CHINA"}, {"c": "YKK DO BRASIL LTDA", "uf": "SP", "city": "SOROCABA", "pot": 323, "ctnr": 13, "ncms": ["Poliéster PTY Cru (54023310)", "Poliéster PTY DDB (54023320)"], "comp": "RELIANCE INDUSTRIES INDIA"}, {"c": "GIAMMINOLA DO BRASIL LTDA.", "uf": "SC", "city": "BRUSQUE", "pot": 313, "ctnr": 12, "ncms": ["Poliéster PTY DDB (54023320)", "Poliéster PTY Cru (54023310)", "Poliéster FDY (54024710)"], "comp": "MRFA GLOBAL UNITED ARAB EMIRATES"}, {"c": "FLK IMPORTADORA E COMERCIAL LTDA", "uf": "SC", "city": "BRUSQUE", "pot": 305, "ctnr": 12, "ncms": ["Poliéster PTY Cru (54023310)", "PV Ring / MVS (55095100)", "PP Ring / MVS (55092100)"], "comp": "ANT TRADING UNITED STATES"}, {"c": "MALHARIA FOREVER KING'S LTDA", "uf": "SC", "city": "PALHOÇA", "pot": 293, "ctnr": 12, "ncms": ["Poliéster PTY Cru (54023310)"], "comp": "TEXPORTO HONG KONG"}, {"c": "LHR COMERCIAL, IMPORTACAO E EXPORTACAO LTDA", "uf": "MG", "city": "JACUTINGA", "pot": 285, "ctnr": 11, "ncms": ["Poliéster PTY DDB (54023320)", "PC / PA (55095300)"], "comp": "CAIHONG IMPORT HONG KONG"}, {"c": "JETFIO INDUSTRIA TEXTIL LTDA", "uf": "SP", "city": "NOVA ODESSA", "pot": 268, "ctnr": 11, "ncms": ["Poliéster PTY Cru (54023310)"], "comp": "TEX PORTO HONG KONG"}, {"c": "SAGE BRASIL INTERIORES AUTOMOTIVOS INDUSTRIA E COMERCIO LTDA.", "uf": "SP", "city": "ARUJÁ", "pot": 256, "ctnr": 10, "ncms": ["Poliéster PTY DDB (54023320)", "Poliéster PTY Cru (54023310)", "Poliéster FDY (54024710)"], "comp": "VS GLOBAL VENTURES PTE SINGAPORE"}, {"c": "P.A. INDUSTRIA TEXTIL S/A", "uf": "SC", "city": "BRUSQUE", "pot": 246, "ctnr": 10, "ncms": ["Poliéster PTY Cru (54023310)"], "comp": "LANDI HONG KONG"}, {"c": "BRASIL ATIVO IND. E COM. DE CONFECCOES LTDA", "uf": "SC", "city": "GASPAR", "pot": 244, "ctnr": 10, "ncms": ["PP Ring / MVS (55092100)", "Poliéster PTY Cru (54023310)", "PC / PA (55095300)"], "comp": "NEO WORLDWIDE UNITED STATES"}, {"c": "ATARA TEXTIL LTDA", "uf": "SC", "city": "INDAIAL", "pot": 241, "ctnr": 9, "ncms": ["Poliéster PTY Cru (54023310)", "Poliéster PTY DDB (54023320)"], "comp": "CX TRADE SWITZERLAND"}, {"c": "ROCATEX INDUSTRIA TEXTIL LTDA", "uf": "SC", "city": "BLUMENAU", "pot": 222, "ctnr": 9, "ncms": ["Poliéster PTY Cru (54023310)", "Poliéster PTY DDB (54023320)"], "comp": "LIDER TRADING HONG KONG"}, {"c": "INDUSTRIAS PIM LTDA", "uf": "SC", "city": "MASSARANDUBA", "pot": 220, "ctnr": 9, "ncms": ["Poliéster PTY Cru (54023310)"], "comp": "NEO WORLDWIDE UNITED STATES"}, {"c": "R R SAMED COMERCIO DE TECIDOS LTDA", "uf": "PE", "city": "SANTA CRUZ DO CAPIBARIBE", "pot": 219, "ctnr": 9, "ncms": ["Poliéster PTY Cru (54023310)", "Poliéster PTY DDB (54023320)"], "comp": "LEB ENTERPRISES UNITED STATES"}, {"c": "DTX INDUSTRIA E COMERCIO DE AVIAMENTOS LTDA", "uf": "PR", "city": "APUCARANA", "pot": 217, "ctnr": 9, "ncms": ["Poliéster PTY DDB (54023320)", "Poliéster PTY Cru (54023310)"], "comp": "ZHUJISHI QIANBEI CHINA"}];
+const STATUSES=['Não iniciado','Em contato','Cotado','Amostra','Ganho','Perdido'];
+const BCLS={'Não iniciado':'b0','Em contato':'b1','Cotado':'b2','Amostra':'b3','Ganho':'b4','Perdido':'b5'};
+const KEY='superia_placar_juan_v1';
+let ST={}; // por cliente: {status,ctnr,data,nota}
+let GOALS={g30c:3,g60c:7,g90c:10,g30t:3,g60t:7,g90t:10,start:new Date().toISOString().slice(0,10)};
+function load(){try{const r=JSON.parse(localStorage.getItem(KEY));if(r){ST=r.ST||{};GOALS=Object.assign(GOALS,r.GOALS||{});}}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({ST,GOALS}));}catch(e){}
+  const t=document.getElementById('savedTag');t.textContent='✓ salvo '+new Date().toLocaleTimeString('pt-BR');}
+function rec(c){return ST[c]||(ST[c]={status:'Não iniciado',ctnr:0,data:'',nota:''});}
+const fmt=n=>Math.round(n).toLocaleString('pt-BR');
+
+function kpis(){
+  const won=DATA.filter(r=>rec(r.c).status==='Ganho');
+  const ctWon=DATA.reduce((s,r)=>s+(+rec(r.c).ctnr||0),0);
+  const emand=DATA.filter(r=>['Em contato','Cotado','Amostra'].includes(rec(r.c).status)).length;
+  document.getElementById('kpis').innerHTML=
+   `<div class="kpi"><div class="l">Carteira do Juan</div><div class="v">67</div><div class="s">clientes prospect</div></div>
+    <div class="kpi"><div class="l">Potencial anual</div><div class="v">67.447 t</div><div class="s">≈ 2.656 contêineres</div></div>
+    <div class="kpi"><div class="l">Ticket médio</div><div class="v">1.007 t</div><div class="s">por cliente</div></div>
+    <div class="kpi"><div class="l">Em andamento</div><div class="v">${emand}</div><div class="s">contato/cotação/amostra</div></div>
+    <div class="kpi"><div class="l">Ganhos</div><div class="v g">${won.length}<span style="font-size:13px"> / ${GOALS.g90c}</span></div><div class="s">meta 90d · ${ctWon} ctnr fechados</div><div class="prog"><i style="width:${Math.min(100,won.length/GOALS.g90c*100)}%"></i></div></div>`;
+}
+function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/864e5);}
+function goals(){
+  const start=GOALS.start;
+  function realized(days){let cli=0,ct=0;DATA.forEach(r=>{const s=rec(r.c);if(s.status==='Ganho'){const d=s.data&&start?daysBetween(start,s.data):0;if(!s.data||d<=days){cli++;ct+=+s.ctnr||0;}}});return {cli,ct};}
+  const rows=[[30,'g30c','g30t'],[60,'g60c','g60t'],[90,'g90c','g90t']].map(([d,gc,gt])=>{
+    const R=realized(d),mc=+GOALS[gc]||0,mt=+GOALS[gt]||0;
+    return `<tr><td>${d} dias</td><td class="n">${mc}</td><td class="n">${R.cli}</td><td class="n">${mc?Math.round(R.cli/mc*100):0}%</td><td class="n">${mt}</td><td class="n">${R.ct}</td><td class="n">${mt?Math.round(R.ct/mt*100):0}%</td></tr>`;
+  }).join('');
+  document.querySelector('#tGoals tbody').innerHTML=rows;
+}
+function funnel(){
+  const cnt={};STATUSES.forEach(s=>cnt[s]=0);DATA.forEach(r=>cnt[rec(r.c).status]++);
+  const mx=DATA.length;
+  document.getElementById('funnel').innerHTML=STATUSES.map(s=>`<div class="fbar"><span class="lab"><span class="badge ${BCLS[s]}">${s}</span></span><div class="track"><i style="width:${cnt[s]/mx*100}%"></i></div><span class="cnt">${cnt[s]}</span></div>`).join('');
+}
+function rowsHtml(){
+  const q=(document.getElementById('q').value||'').toLowerCase();
+  const fu=document.getElementById('fUf').value, fs=document.getElementById('fSt').value;
+  let shown=0;
+  const body=DATA.map((r,i)=>({r,i})).filter(({r})=>(!q||r.c.toLowerCase().includes(q))&&(!fu||r.uf===fu)&&(!fs||rec(r.c).status===fs)).map(({r,i})=>{
+    const s=rec(r.c);shown++;
+    const opts=STATUSES.map(x=>`<option${x===s.status?' selected':''}>${x}</option>`).join('');
+    return `<tr><td>${i+1}</td><td><b>${r.c}</b><br><span style="font-size:10.5px;color:#8a95a0">${r.city}</span></td><td>${r.uf}</td><td class="n">${fmt(r.pot)}</td><td class="n">${fmt(r.ctnr)}</td>
+    <td>${r.ncms.map(n=>`<span class="chip">${n}</span>`).join('')}</td><td style="font-size:11.5px">${r.comp}</td>
+    <td><select class="st" data-c="${encodeURIComponent(r.c)}">${opts}</select></td>
+    <td class="n"><input class="ct" type="number" min="0" data-c="${encodeURIComponent(r.c)}" value="${s.ctnr||''}"></td>
+    <td><input class="dt" type="date" data-c="${encodeURIComponent(r.c)}" value="${s.data||''}"></td>
+    <td><input class="nt" data-c="${encodeURIComponent(r.c)}" value="${(s.nota||'').replace(/"/g,'&quot;')}"></td></tr>`;
+  }).join('');
+  document.querySelector('#tAlvos tbody').innerHTML=body;
+  document.getElementById('cnt').textContent=shown+' de '+DATA.length+' clientes';
+  document.querySelectorAll('#tAlvos select.st').forEach(el=>el.onchange=()=>{rec(decodeURIComponent(el.dataset.c)).status=el.value;save();refresh();});
+  document.querySelectorAll('#tAlvos input.ct').forEach(el=>el.onchange=()=>{rec(decodeURIComponent(el.dataset.c)).ctnr=+el.value||0;save();kpis();goals();});
+  document.querySelectorAll('#tAlvos input.dt').forEach(el=>el.onchange=()=>{rec(decodeURIComponent(el.dataset.c)).data=el.value;save();goals();});
+  document.querySelectorAll('#tAlvos input.nt').forEach(el=>el.onchange=()=>{rec(decodeURIComponent(el.dataset.c)).nota=el.value;save();});
+}
+function refresh(){kpis();goals();funnel();rowsHtml();}
+function fillGoalsInputs(){['g30c','g60c','g90c','g30t','g60t','g90t'].forEach(k=>{const el=document.getElementById(k);el.value=GOALS[k];el.onchange=()=>{GOALS[k]=+el.value||0;save();kpis();goals();};});
+  const sd=document.getElementById('startDate');sd.value=GOALS.start;sd.onchange=()=>{GOALS.start=sd.value;save();goals();};}
+function buildFilters(){
+  const ufs=[...new Set(DATA.map(r=>r.uf))].sort();document.getElementById('fUf').innerHTML='<option value="">UF (todas)</option>'+ufs.map(u=>`<option>${u}</option>`).join('');
+  document.getElementById('fSt').innerHTML='<option value="">Status (todos)</option>'+STATUSES.map(s=>`<option>${s}</option>`).join('');
+  document.getElementById('q').oninput=rowsHtml;document.getElementById('fUf').onchange=rowsHtml;document.getElementById('fSt').onchange=rowsHtml;
+}
+// Excel
+document.getElementById('xls').onclick=()=>{
+  const rows=DATA.map((r,i)=>{const s=rec(r.c);return {'#':i+1,Cliente:r.c,Cidade:r.city,UF:r.uf,'Potencial (t)':r.pot,'Contêineres potencial':r.ctnr,'NCMs-alvo':r.ncms.join(' | '),'Concorrente a deslocar':r.comp,Status:s.status,'Ctnr fechados':s.ctnr||0,Data:s.data||'',Notas:s.nota||''};});
+  const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows);XLSX.utils.book_append_sheet(wb,ws,'Placar Juan');
+  XLSX.writeFile(wb,'Placar_Juan_'+new Date().toISOString().slice(0,10)+'.xlsx');
+};
+document.getElementById('bkp').onclick=()=>{const b=new Blob([JSON.stringify({ST,GOALS},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='placar_juan_backup.json';a.click();};
+document.getElementById('imp').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const j=JSON.parse(rd.result);ST=j.ST||ST;GOALS=Object.assign(GOALS,j.GOALS||{});save();fillGoalsInputs();refresh();}catch(err){alert('Backup inválido');}};rd.readAsText(f);};
+// init
+load();buildFilters();fillGoalsInputs();refresh();
+</script></body></html>
