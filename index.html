@@ -94,6 +94,7 @@
   <!-- KPIs -->
   <section>
     <div class="sh"><h2>Gaps atuais</h2><span class="tag">US$/kg</span><span class="note">Δ vs. leitura anterior</span></div>
+    <div class="controls" style="margin-bottom:12px"><label for="selPoy">POY (fornecedor p/ gap):</label><select id="selPoy"><option value="HENGYI">HENGYI</option><option value="TONGKUN">TONGKUN</option></select><span class="note">compare os fornecedores no painel “Matéria-prima” abaixo.</span></div>
     <div class="kpis" id="kpis"></div>
   </section>
 
@@ -122,7 +123,7 @@
     <div class="sh"><h2>Cruzamento</h2><span class="tag">base 100</span><span class="note">quem sobe mais rápido desde o início da série</span></div>
     <div class="grid2">
       <div class="panel"><h3>Evolução comparada (base 100)</h3><p class="psub">Cada estágio parte de 100 na 1ª data — descola = descompasso.</p><div class="chart-box"><canvas id="cnorm"></canvas></div></div>
-      <div class="panel"><h3>Matéria-prima</h3><p class="psub">POY 250/48 (HENGYI) e Fibra PSF 1,2D×32</p><div class="chart-box sm"><canvas id="craw"></canvas></div></div>
+      <div class="panel"><h3>Matéria-prima · POY por fornecedor</h3><p class="psub">POY 250/48 HENGYI vs TONGKUN · POY 125/36 (ref.) · Fibra PSF</p><div class="chart-box sm"><canvas id="craw"></canvas></div></div>
     </div>
   </section>
 
@@ -147,10 +148,15 @@
    pontos: [ ['AAAA-MM-DD', preço], ... ]  (FOB US$/kg, ordem crescente)
    Novo dia: adicione ['2026-09-04', 1.39] na série certa.
    =========================================================== */
+// POY 250/48 SD RW por fornecedor (base das duas famílias). Filtro define qual entra no gap.
+const POY250 = {
+  HENGYI:[['2026-07-27',1.13],['2026-08-04',1.12],['2026-08-26',1.16],['2026-09-02',1.22]],
+  TONGKUN:[['2026-08-04',1.13],['2026-09-02',1.19],['2026-09-03',1.25]]
+};
 const SERIES = [
-  // FAMÍLIA 150/48
-  {id:'poy150', fam:'150/48', estagio:'POY', label:'POY 250/48 SD RW', forn:'HENGYI', cor:'--poy',
-    pontos:[['2026-07-27',1.13],['2026-08-04',1.12],['2026-08-26',1.16],['2026-09-02',1.22]]},
+  // FAMÍLIA 150/48 — POY é derivado (recebe o fornecedor selecionado)
+  {id:'poy150', fam:'150/48', estagio:'POY', label:'POY 250/48 SD RW', forn:'HENGYI', cor:'--poy', derived:true,
+    pontos:POY250.HENGYI.slice()},
   {id:'t150_NIM', fam:'150/48', estagio:'Texturizado', variante:'NIM', label:'PTY 150/48 NIM', forn:'TONGKUN', text:true, cor:'--text',
     pontos:[['2026-07-27',1.24],['2026-08-03',1.22],['2026-08-11',1.21],['2026-08-17',1.23],['2026-08-19',1.23],['2026-08-21',1.25],['2026-08-31',1.30],['2026-09-01',1.305],['2026-09-03',1.37]]},
   {id:'t150_HIM', fam:'150/48', estagio:'Texturizado', variante:'HIM', label:'PTY 150/48 HIM', forn:'TONGKUN', text:true, cor:'--text',
@@ -161,8 +167,8 @@ const SERIES = [
     pontos:[['2026-07-27',1.18],['2026-08-19',1.20],['2026-08-24',1.25],['2026-09-03',1.28]]},
 
   // FAMÍLIA 75/36
-  {id:'poy75', fam:'75/36', estagio:'POY', label:'POY 250/48 SD RW (base do 75/36)', forn:'HENGYI', cor:'--poy',
-    pontos:[['2026-07-27',1.13],['2026-08-04',1.12],['2026-08-26',1.16],['2026-09-02',1.22]]},
+  {id:'poy75', fam:'75/36', estagio:'POY', label:'POY 250/48 SD RW (base 75/36)', forn:'HENGYI', cor:'--poy', derived:true,
+    pontos:POY250.HENGYI.slice()},
   {id:'t75_NIM', fam:'75/36', estagio:'Texturizado', variante:'NIM', label:'PTY 75/36 NIM', forn:'TONGKUN', text:true, cor:'--text',
     pontos:[['2026-07-27',1.34],['2026-08-03',1.31],['2026-08-10',1.29],['2026-08-11',1.32],['2026-08-17',1.34],['2026-08-19',1.34],['2026-08-21',1.36],['2026-08-31',1.39],['2026-09-01',1.40],['2026-09-03',1.46]]},
   {id:'t75_HIM', fam:'75/36', estagio:'Texturizado', variante:'HIM', label:'PTY 75/36 HIM', forn:'TONGKUN', text:true, cor:'--text',
@@ -174,7 +180,13 @@ const SERIES = [
   {id:'fdy75', fam:'75/36', estagio:'FDY (ref.)', label:'FDY 75/36 SD RW', forn:'TONGKUN', ref:true, cor:'--fdy',
     pontos:[['2026-07-27',1.22],['2026-08-19',1.24],['2026-08-24',1.29],['2026-09-03',1.32]]},
 
-  // MATÉRIA-PRIMA / FIBRA
+  // MATÉRIA-PRIMA — POY por fornecedor (comparação)
+  {id:'poyH', fam:'Matéria-prima', estagio:'POY 250/48', label:'POY 250/48 SD RW · HENGYI', forn:'HENGYI', cor:'--poy', pontos:POY250.HENGYI},
+  {id:'poyT', fam:'Matéria-prima', estagio:'POY 250/48', label:'POY 250/48 SD RW · TONGKUN', forn:'TONGKUN', cor:'#8FD3FF', pontos:POY250.TONGKUN},
+  {id:'poy125T', fam:'Matéria-prima', estagio:'POY 125/36', label:'POY 125/36 SD RW · TONGKUN (ref.)', forn:'TONGKUN', cor:'#B7E1C9', ref:true,
+    pontos:[['2026-09-02',1.205],['2026-09-03',1.265]]},
+
+  // FIBRA
   {id:'psf_xfm', fam:'Fibra', estagio:'PSF', label:'PSF 1,2D×32 (XFM, FOB)', forn:'XFM', cor:'--psf',
     pontos:[['2026-07-23',1.045],['2026-08-17',1.055],['2026-08-18',1.065]]},
   {id:'psf_hy', fam:'Fibra', estagio:'PSF', label:'PSF 1,2D×32 crua (HENGYI Xiamen, CFR Pecém)', forn:'HENGYI XIAMEN', cor:'--tinta',
@@ -229,7 +241,7 @@ function normChart(cid,ids){
       scales:{x:{grid:{color:gridClr}},y:{grid:{color:gridClr},ticks:{callback:v=>v}}}}});
 }
 
-const state={ref150:'t150_NIM',ref75:'t75_NIM'};let ch={};
+const state={ref150:'t150_NIM',ref75:'t75_NIM',poySup:'HENGYI'};let ch={};
 const tvars=fam=>SERIES.filter(s=>s.fam===fam&&s.text);
 function fillSel(id,fam,cur){const sel=document.getElementById(id);sel.innerHTML='';
   tvars(fam).forEach(s=>{const o=document.createElement('option');o.value=s.id;
@@ -244,7 +256,11 @@ const gaps75=()=>[
   {label:'Tingimento (tinta−branca)',from:'hb75',to:'ht75',color:css('--tinta')},
 ];
 const idsNorm=()=>['poy150',state.ref150,state.ref75,'fdy150'];
-const idsRaw=()=>['poy150','psf_xfm','psf_hy'];
+const idsRaw=()=>['poyH','poyT','poy125T','psf_xfm','psf_hy'];
+function applyPoySup(){
+  const pts=POY250[state.poySup]||POY250.HENGYI;
+  ['poy150','poy75'].forEach(id=>{ S[id].pontos=pts; S[id].forn=state.poySup; });
+}
 
 function render(){
   if(typeof Chart==='undefined'){document.querySelectorAll('.chart-box').forEach(b=>b.innerHTML='<div style="color:var(--mut);padding:20px;text-align:center;font-size:12px">Gráfico requer internet (Chart.js). KPIs e tabela funcionam.</div>');return;}
@@ -278,7 +294,7 @@ function buildKPIs(){const c=document.getElementById('kpis');c.innerHTML='';
   kpi(c,{lab:'75/36 · Tingimento',from:'hb75',to:'ht75',color:css('--tinta')});
 }
 function buildTable(){const tb=document.querySelector('#dataTable tbody');tb.innerHTML='';
-  SERIES.forEach(s=>{const lp=lastPoint(s),pp=prevPoint(s);
+  SERIES.filter(s=>!s.derived).forEach(s=>{const lp=lastPoint(s),pp=prevPoint(s);
     let d30='—',cls='';if(lp&&pp){const dd=+(lp[1]-pp[1]).toFixed(3);cls=dd>0?'up-n':dd<0?'down-n':'';d30=(dd>0?'+':'')+dd.toFixed(3);}
     const tr=document.createElement('tr');
     tr.innerHTML=`<td>${s.fam}</td>
@@ -295,7 +311,8 @@ function buildTable(){const tb=document.querySelector('#dataTable tbody');tb.inn
 fillSel('sel150','150/48',state.ref150);fillSel('sel75','75/36',state.ref75);
 document.getElementById('sel150').addEventListener('change',e=>{state.ref150=e.target.value;buildKPIs();render();});
 document.getElementById('sel75').addEventListener('change',e=>{state.ref75=e.target.value;buildKPIs();render();});
-buildTable();buildKPIs();render();
+document.getElementById('selPoy').addEventListener('change',e=>{state.poySup=e.target.value;applyPoySup();buildKPIs();buildTable();render();});
+applyPoySup();buildTable();buildKPIs();render();
 </script>
 </body>
 </html>
