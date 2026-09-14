@@ -103,7 +103,7 @@
     <div class="sh"><h2>Família 150/48</h2><span class="tag" id="tag150">POY 250/48 → Texturizado 150/48</span></div>
     <div class="controls"><label for="sel150">Texturizado de ref.:</label><select id="sel150"></select></div>
     <div class="grid2">
-      <div class="panel"><h3>Preço por estágio</h3><p class="psub">POY 250/48 · Texturizado · FDY (ref.)</p><div class="chart-box"><canvas id="c150p"></canvas></div></div>
+      <div class="panel"><h3>Preço por estágio</h3><p class="psub">POY 250/48 · DTY (texturizado)</p><div class="chart-box"><canvas id="c150p"></canvas></div></div>
       <div class="panel"><h3>Gap de texturização</h3><p class="psub">Texturizado − POY (US$/kg)</p><div class="chart-box sm"><canvas id="c150g"></canvas></div></div>
     </div>
   </section>
@@ -113,7 +113,7 @@
     <div class="sh"><h2>Família 75/36</h2><span class="tag" id="tag75">POY → Texturizado → Helanca Branca → Tinta</span></div>
     <div class="controls"><label for="sel75">Texturizado de ref.:</label><select id="sel75"></select></div>
     <div class="grid2">
-      <div class="panel"><h3>Preço por estágio</h3><p class="psub">POY 250/48 (base) · Texturizado · Helanca Branca · Helanca Tinta · FDY (ref.)</p><div class="chart-box"><canvas id="c75p"></canvas></div></div>
+      <div class="panel"><h3>Preço por estágio</h3><p class="psub">POY 250/48 (base) · DTY (texturizado) · Helanca Branca · Helanca Tinta</p><div class="chart-box"><canvas id="c75p"></canvas></div></div>
       <div class="panel"><h3>Gaps da cadeia</h3><p class="psub">Texturização · Beneficiamento · Tingimento</p><div class="chart-box sm"><canvas id="c75g"></canvas></div></div>
     </div>
   </section>
@@ -158,29 +158,25 @@ const SERIES = [
   {id:'poy150', fam:'150/48', estagio:'POY', label:'POY 250/48 SD RW', forn:'HENGYI', cor:'--poy', derived:true,
     pontos:POY250.HENGYI.slice()},
   {id:'t150_NIM', fam:'150/48', estagio:'Texturizado', variante:'NIM', label:'PTY 150/48 NIM', forn:'TONGKUN', text:true, cor:'--text',
-    pontos:[['2026-07-27',1.24],['2026-08-03',1.22],['2026-08-11',1.21],['2026-08-17',1.23],['2026-08-19',1.23],['2026-08-21',1.25],['2026-08-31',1.30],['2026-09-01',1.305],['2026-09-03',1.37],['2026-09-07',1.36]]},
+    pontos:[['2026-07-27',1.24],['2026-08-03',1.22],['2026-08-11',1.21],['2026-08-17',1.23],['2026-08-19',1.23],['2026-08-21',1.25],['2026-08-31',1.30],['2026-09-01',1.305],['2026-09-03',1.37],['2026-09-07',1.36],['2026-09-14',1.41]]},
   {id:'t150_HIM', fam:'150/48', estagio:'Texturizado', variante:'HIM', label:'PTY 150/48 HIM', forn:'TONGKUN', text:true, cor:'--text',
-    pontos:[['2026-07-27',1.30],['2026-08-03',1.28],['2026-08-11',1.27],['2026-08-17',1.29],['2026-08-19',1.29],['2026-08-21',1.31],['2026-08-31',1.36],['2026-09-03',1.43],['2026-09-07',1.42]]},
+    pontos:[['2026-07-27',1.30],['2026-08-03',1.28],['2026-08-11',1.27],['2026-08-17',1.29],['2026-08-19',1.29],['2026-08-21',1.31],['2026-08-31',1.36],['2026-09-03',1.43],['2026-09-07',1.42],['2026-09-14',1.47]]},
   {id:'t150_SIM', fam:'150/48', estagio:'Texturizado', variante:'SIM', label:'PTY 150/48 SIM', forn:'TONGKUN', text:true, cor:'--text',
-    pontos:[['2026-07-27',1.28],['2026-09-03',1.40],['2026-09-07',1.39]]},
-  {id:'fdy150', fam:'150/48', estagio:'FDY (ref.)', label:'FDY 150/48 SD RW', forn:'TONGKUN', ref:true, cor:'--fdy',
-    pontos:[['2026-07-27',1.18],['2026-08-19',1.20],['2026-08-24',1.25],['2026-09-03',1.28]]},
+    pontos:[['2026-07-27',1.28],['2026-09-03',1.40],['2026-09-07',1.39],['2026-09-14',1.44]]},
 
   // FAMÍLIA 75/36
   {id:'poy75', fam:'75/36', estagio:'POY', label:'POY 250/48 SD RW (base 75/36)', forn:'HENGYI', cor:'--poy', derived:true,
     pontos:POY250.HENGYI.slice()},
   {id:'t75_NIM', fam:'75/36', estagio:'Texturizado', variante:'NIM', label:'PTY 75/36 NIM', forn:'TONGKUN', text:true, cor:'--text',
-    pontos:[['2026-07-27',1.34],['2026-08-03',1.31],['2026-08-10',1.29],['2026-08-11',1.32],['2026-08-17',1.34],['2026-08-19',1.34],['2026-08-21',1.36],['2026-08-31',1.39],['2026-09-01',1.40],['2026-09-03',1.46],['2026-09-07',1.45]]},
+    pontos:[['2026-07-27',1.34],['2026-08-03',1.31],['2026-08-10',1.29],['2026-08-11',1.32],['2026-08-17',1.34],['2026-08-19',1.34],['2026-08-21',1.36],['2026-08-31',1.39],['2026-09-01',1.40],['2026-09-03',1.46],['2026-09-07',1.45],['2026-09-14',1.49]]},
   {id:'t75_HIM', fam:'75/36', estagio:'Texturizado', variante:'HIM', label:'PTY 75/36 HIM', forn:'TONGKUN', text:true, cor:'--text',
-    pontos:[['2026-07-27',1.46],['2026-08-11',1.41],['2026-08-17',1.43],['2026-08-19',1.43],['2026-08-21',1.45],['2026-09-03',1.59],['2026-09-07',1.58]]},
+    pontos:[['2026-07-27',1.46],['2026-08-11',1.41],['2026-08-17',1.43],['2026-08-19',1.43],['2026-08-21',1.45],['2026-09-03',1.59],['2026-09-07',1.58],['2026-09-14',1.62]]},
   {id:'t75_SIM', fam:'75/36', estagio:'Texturizado', variante:'SIM', label:'PTY 75/36 SIM', forn:'TONGKUN', text:true, cor:'--text',
-    pontos:[['2026-07-27',1.38],['2026-09-03',1.51],['2026-09-07',1.50]]},
+    pontos:[['2026-07-27',1.38],['2026-09-03',1.51],['2026-09-07',1.50],['2026-09-14',1.54]]},
   {id:'hb75', fam:'75/36', estagio:'Helanca Branca', label:'Helanca 75/36 Branca/Crua (PJ0036, malha 120gsm)', forn:'PJ0036', cor:'--branca',
     pontos:[['2026-08-04',1.62],['2026-08-11',1.66],['2026-08-18',1.62],['2026-08-25',1.60],['2026-09-01',1.78],['2026-09-08',1.95]]},
   {id:'ht75', fam:'75/36', estagio:'Helanca Tinta', label:'Helanca 75/36 Tinta/Cores (PJ0036, malha 120gsm)', forn:'PJ0036', cor:'--tinta',
     pontos:[['2026-08-04',1.71],['2026-08-11',1.76],['2026-08-18',1.72],['2026-08-25',1.76],['2026-09-01',1.88],['2026-09-08',2.05]]},
-  {id:'fdy75', fam:'75/36', estagio:'FDY (ref.)', label:'FDY 75/36 SD RW', forn:'TONGKUN', ref:true, cor:'--fdy',
-    pontos:[['2026-07-27',1.22],['2026-08-19',1.24],['2026-08-24',1.29],['2026-09-03',1.32]]},
 
   // MATÉRIA-PRIMA — POY por fornecedor (comparação)
   {id:'poyH', fam:'Matéria-prima', estagio:'POY 250/48', label:'POY 250/48 SD RW · HENGYI', forn:'HENGYI', cor:'--poy', pontos:POY250.HENGYI},
@@ -190,7 +186,7 @@ const SERIES = [
 
   // FIBRA
   {id:'psf_xfm', fam:'Fibra', estagio:'PSF', label:'PSF 1,2D×32 (XFM, FOB)', forn:'XFM', cor:'--psf',
-    pontos:[['2026-07-23',1.045],['2026-08-17',1.055],['2026-08-18',1.065],['2026-09-04',1.115],['2026-09-09',1.145],['2026-09-10',1.17]]},
+    pontos:[['2026-07-23',1.045],['2026-08-17',1.055],['2026-08-18',1.065],['2026-09-04',1.115],['2026-09-09',1.145],['2026-09-10',1.17],['2026-09-14',1.19]]},
   {id:'psf_hy', fam:'Fibra', estagio:'PSF', label:'PSF 1,2D×32 crua (HENGYI Xiamen, CFR Pecém)', forn:'HENGYI XIAMEN', cor:'--tinta',
     pontos:[['2026-09-03',1.50]]},
 ];
@@ -249,15 +245,15 @@ function fillSel(id,fam,cur){const sel=document.getElementById(id);sel.innerHTML
   tvars(fam).forEach(s=>{const o=document.createElement('option');o.value=s.id;
     o.textContent=s.variante+(lastPoint(s)?` — US$ ${lastPoint(s)[1].toFixed(3)}`:'');if(s.id===cur)o.selected=true;sel.appendChild(o);});}
 
-const ids150=()=>['poy150',state.ref150,'fdy150'];
-const ids75=()=>[state.ref75,'hb75','ht75','fdy75','poy75'];
+const ids150=()=>['poy150',state.ref150];
+const ids75=()=>['poy75',state.ref75,'hb75','ht75'];
 const gaps150=()=>[{label:'Gap texturização',from:'poy150',to:state.ref150,color:css('--text')}];
 const gaps75=()=>[
   {label:'Texturização (text.−POY)',from:'poy75',to:state.ref75,color:css('--text')},
   {label:'Beneficiamento (branca−text.)',from:state.ref75,to:'hb75',color:css('--poy')},
   {label:'Tingimento (tinta−branca)',from:'hb75',to:'ht75',color:css('--tinta')},
 ];
-const idsNorm=()=>['poy150',state.ref150,state.ref75,'fdy150'];
+const idsNorm=()=>['poy150',state.ref150,state.ref75];
 const idsRaw=()=>['poyH','poyT','poy125T','psf_xfm','psf_hy'];
 function applyPoySup(){
   const pts=POY250[state.poySup]||POY250.HENGYI;
