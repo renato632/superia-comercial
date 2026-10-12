@@ -3,314 +3,238 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SUPERIA · Monitor de Gaps — Cadeia Poliéster</title>
+<title>SUPERIA · Monitor de Gap</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root{
     --bg:#0F2B25; --bg2:#164034; --panel:#12352C; --panel2:#173E33;
-    --line:rgba(87,201,154,.16); --line2:rgba(255,255,255,.06);
+    --line:rgba(87,201,154,.18); --line2:rgba(255,255,255,.06);
     --tx:#EAF3EF; --mut:#9FC4B6; --acc:#57C99A;
-    --poy:#6FB1FF; --text:#57C99A; --branca:#E9EDEA; --tinta:#C77DFF; --fdy:#F2B857; --psf:#FF9F6E;
-    --up:#3FBF75; --down:#E5675A;
+    --g1:#57C99A; --g2:#6FB1FF; --up:#E5675A; --down:#3FBF75;
     --radius:16px;
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%;font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
   body{background:var(--bg);color:var(--tx)}
-  a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
-  .wrap{max-width:1240px;margin:0 auto;padding:0 20px 60px}
-  header{background:radial-gradient(1200px 520px at 50% -20%,var(--bg2) 0%,var(--bg) 62%);
-    padding:30px 20px 24px;text-align:center;border-bottom:1px solid var(--line)}
-  header .top{display:flex;justify-content:space-between;align-items:center;max-width:1240px;margin:0 auto 16px;font-size:13px}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px 56px}
+  header{background:radial-gradient(1100px 460px at 50% -20%,var(--bg2) 0%,var(--bg) 62%);
+    padding:28px 20px 22px;text-align:center;border-bottom:1px solid var(--line)}
+  header .top{display:flex;justify-content:space-between;align-items:center;max-width:1040px;margin:0 auto 14px;font-size:13px}
   header .brand{letter-spacing:.5px;color:var(--mut);font-weight:600}
   header .brand b{color:var(--acc)}
-  header h1{font-size:29px;margin:4px 0 0}header h1 b{color:var(--acc)}
-  header .sub{color:var(--mut);margin:9px auto 0;font-size:14px;max-width:760px;line-height:1.5}
-  .upd{margin-top:10px;font-size:12px;color:var(--mut)}.upd span{color:var(--acc)}
+  header h1{font-size:27px;margin:4px 0 0}header h1 b{color:var(--acc)}
+  header .sub{color:var(--mut);margin:9px auto 0;font-size:14px;max-width:680px;line-height:1.5}
+  .upd{margin-top:9px;font-size:12px;color:var(--mut)}.upd span{color:var(--acc)}
 
-  section{margin-top:30px}
-  .sh{display:flex;align-items:baseline;gap:12px;margin:0 0 14px;flex-wrap:wrap}
-  .sh h2{font-size:19px;margin:0}
-  .sh .tag{font-size:11.5px;color:var(--acc);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
-  .sh .note{font-size:12px;color:var(--mut)}
+  /* filtro de período */
+  .filter{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin:22px 0 8px}
+  .seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{background:transparent;color:var(--mut);border:0;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+  .seg button.active{background:var(--acc);color:#06241a}
+  .range{display:inline-flex;gap:7px;align-items:center;font-size:12.5px;color:var(--mut)}
+  .range input{background:var(--bg2);color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:12.5px;font-family:inherit;color-scheme:dark}
+  .range button{background:var(--panel2);color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
+  .range button.clr{color:var(--mut)}
 
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
-  .kpi{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--radius);padding:15px 15px 13px;position:relative;overflow:hidden}
-  .kpi .lab{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;line-height:1.3;min-height:28px}
-  .kpi .val{font-size:25px;font-weight:700;margin-top:7px}
-  .kpi .val small{font-size:12px;color:var(--mut);font-weight:500}
-  .kpi .meta{font-size:11.5px;color:var(--mut);margin-top:4px}
-  .kpi .delta{margin-top:7px;font-size:11.5px}
+  /* KPIs */
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+  .kpi{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px 16px;position:relative;overflow:hidden}
+  .kpi .bar{position:absolute;left:0;top:0;height:4px;width:100%}
+  .kpi .lab{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+  .kpi .flow{font-size:12.5px;color:var(--mut);margin-top:3px}
+  .kpi .big{font-size:40px;font-weight:800;margin-top:12px;line-height:1}
+  .kpi .big small{font-size:16px;color:var(--mut);font-weight:600}
+  .kpi .pct{display:inline-block;margin-top:8px;font-size:15px;font-weight:700}
+  .kpi .meta{font-size:12px;color:var(--mut);margin-top:8px}
+  .kpi .delta{font-size:12.5px;margin-top:4px;font-weight:600}
   .kpi .delta.up{color:var(--up)}.kpi .delta.down{color:var(--down)}.kpi .delta.flat{color:var(--mut)}
-  .kpi .bar{position:absolute;left:0;top:0;height:3px;width:100%}
-  .kpi.empty .val{color:var(--mut);font-size:18px}
-  .kpi .pct{font-weight:600}
 
-  .grid2{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;margin-top:14px}
-  .panel{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--radius);padding:15px 15px 17px}
-  .panel h3{margin:0 0 3px;font-size:14px}
-  .panel .psub{font-size:11.5px;color:var(--mut);margin:0 0 11px}
-  .chart-box{position:relative;height:300px}.chart-box.sm{height:280px}
-  .controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:2px 0 2px}
-  .controls label{font-size:12px;color:var(--mut)}
-  select{background:var(--bg2);color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12.5px;font-family:inherit}
-  select:focus{outline:1px solid var(--acc)}
+  .panel{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--radius);padding:16px 16px 18px;margin-top:16px}
+  .panel h3{margin:0 0 2px;font-size:15px}
+  .panel .psub{font-size:12px;color:var(--mut);margin:0 0 12px}
+  .chart-box{position:relative;height:320px}
 
-  .chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
-  .chip{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:12px;padding:10px 14px;min-width:150px}
-  .chip .c-l{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
-  .chip .c-v{font-size:20px;font-weight:700;margin-top:3px}
-  .chip .c-d{font-size:11px;margin-top:2px}
-  .chip .c-d.up{color:var(--up)}.chip .c-d.down{color:var(--down)}.chip .c-d.flat{color:var(--mut)}
-
-  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);margin-top:14px}
-  table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:680px}
-  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line2)}
-  th{background:rgba(87,201,154,.08);color:var(--acc);font-weight:600;white-space:nowrap}
-  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  table{border-collapse:collapse;width:100%;font-size:13px;margin-top:4px}
+  th,td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--line2)}
+  th:first-child,td:first-child{text-align:left}
+  th{color:var(--acc);font-weight:600;white-space:nowrap}
+  td{font-variant-numeric:tabular-nums}
   tr:last-child td{border-bottom:none}
-  .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line)}
-  .miss{color:var(--fdy)}
-  .up-n{color:var(--up)}.down-n{color:var(--down)}
-  footer{margin-top:34px;border-top:1px solid var(--line);padding-top:16px;text-align:center;color:var(--mut);font-size:11.5px;line-height:1.6}
+  .c1{color:var(--g1);font-weight:700}.c2{color:var(--g2);font-weight:700}
+
+  footer{margin-top:26px;border-top:1px solid var(--line);padding-top:14px;text-align:center;color:var(--mut);font-size:11.5px;line-height:1.6}
   footer b{color:var(--acc)}
-  @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}}
-  @media(max-width:520px){.kpis{grid-template-columns:1fr}}
+  @media(max-width:720px){.kpis{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header>
   <div class="top">
     <div class="brand">SUPERIA · <b>Inteligência Comercial</b></div>
-    <div><a href="./index.html">← Início</a></div>
+    <div class="brand">Fios e Fibras</div>
   </div>
-  <h1>Monitor de <b>Gaps</b> — Cadeia Poliéster</h1>
-  <div class="sub">POY → Texturizado → Helanca (branca e tinta). Spread entre estágios em US$/kg · FOB. Clique na legenda para ligar/desligar séries.</div>
-  <div class="upd">Atualizado até <span id="lastUpd">—</span> · benchmark: POY <b>HENGYI</b> · Texturizado <b>TONGKUN</b></div>
+  <h1>Monitor de <b>Gap</b> — Cadeia Poliéster</h1>
+  <div class="sub">Dois spreads que importam, em <b>¢/kg e %</b>. Texturização (POY→DTY 150/48) e Beneficiamento (DTY 75/36→Helanca). Variante NIM.</div>
+  <div class="upd">Atualizado até <span id="lastUpd">—</span> · base US$/kg FOB · POY HENGYI · DTY TONGKUN · Helanca PJ0036</div>
 </header>
 
 <div class="wrap">
 
-  <!-- KPIs -->
-  <section>
-    <div class="sh"><h2>Gaps atuais</h2><span class="tag">US$/kg</span><span class="note">Δ vs. leitura anterior</span></div>
-    <div class="controls" style="margin-bottom:12px"><label for="selPoy">POY (fornecedor p/ gap):</label><select id="selPoy"><option value="HENGYI">HENGYI</option><option value="TONGKUN">TONGKUN</option></select><span class="note">compare os fornecedores no painel “Matéria-prima” abaixo.</span></div>
-    <div class="kpis" id="kpis"></div>
-  </section>
-
-  <!-- 150/48 -->
-  <section>
-    <div class="sh"><h2>Família 150/48</h2><span class="tag" id="tag150">POY 250/48 → Texturizado 150/48</span></div>
-    <div class="controls"><label for="sel150">Texturizado de ref.:</label><select id="sel150"></select></div>
-    <div class="grid2">
-      <div class="panel"><h3>Preço por estágio</h3><p class="psub">POY 250/48 · DTY (texturizado)</p><div class="chart-box"><canvas id="c150p"></canvas></div></div>
-      <div class="panel"><h3>Gap de texturização</h3><p class="psub">Texturizado − POY (US$/kg)</p><div class="chart-box sm"><canvas id="c150g"></canvas></div></div>
+  <div class="filter">
+    <div class="seg" id="seg">
+      <button data-p="30">30 dias</button>
+      <button data-p="90">90 dias</button>
+      <button data-p="all" class="active">Tudo</button>
     </div>
-  </section>
-
-  <!-- 75/36 -->
-  <section>
-    <div class="sh"><h2>Família 75/36</h2><span class="tag" id="tag75">POY → Texturizado → Helanca Branca → Tinta</span></div>
-    <div class="controls"><label for="sel75">Texturizado de ref.:</label><select id="sel75"></select></div>
-    <div class="grid2">
-      <div class="panel"><h3>Preço por estágio</h3><p class="psub">POY 250/48 (base) · DTY (texturizado) · Helanca Branca · Helanca Tinta</p><div class="chart-box"><canvas id="c75p"></canvas></div></div>
-      <div class="panel"><h3>Gaps da cadeia</h3><p class="psub">Texturização · Beneficiamento · Tingimento</p><div class="chart-box sm"><canvas id="c75g"></canvas></div></div>
+    <div class="range">
+      De <input type="date" id="d1"> Até <input type="date" id="d2">
+      <button id="apply">Aplicar</button>
+      <button id="clear" class="clr">Limpar</button>
     </div>
-  </section>
+  </div>
 
-  <!-- cruzamento -->
-  <section>
-    <div class="sh"><h2>Cruzamento</h2><span class="tag">base 100</span><span class="note">quem sobe mais rápido desde o início da série</span></div>
-    <div class="grid2">
-      <div class="panel"><h3>Evolução comparada (base 100)</h3><p class="psub">Cada estágio parte de 100 na 1ª data — descola = descompasso.</p><div class="chart-box"><canvas id="cnorm"></canvas></div></div>
-      <div class="panel"><h3>Matéria-prima · POY por fornecedor</h3><p class="psub">POY 250/48 HENGYI vs TONGKUN · POY 125/36 (ref.) · Fibra PSF</p><div class="chart-box sm"><canvas id="craw"></canvas></div></div>
-    </div>
-  </section>
+  <div class="kpis" id="kpis"></div>
 
-  <!-- tabela -->
-  <section>
-    <div class="sh"><h2>Base de dados</h2><span class="note">último preço de cada série · alimentado diariamente</span></div>
-    <div class="tablewrap"><table id="dataTable">
-      <thead><tr><th>Família</th><th>Estágio</th><th>SKU</th><th>Forn.</th><th class="num">Atual<br>US$/kg</th><th class="num">Δ 30d</th><th>Atualização</th></tr></thead>
-      <tbody></tbody>
-    </table></div>
-  </section>
+  <div class="panel">
+    <h3>Evolução dos gaps</h3>
+    <p class="psub">Spread entre estágios em ¢/kg · passe o mouse para ver os valores</p>
+    <div class="chart-box"><canvas id="chart"></canvas></div>
+  </div>
+
+  <div class="panel">
+    <h3>Leituras no período</h3>
+    <p class="psub">¢/kg por data</p>
+    <div style="overflow-x:auto"><table id="tbl"><thead><tr>
+      <th>Data</th><th>Texturização 150/48<br>(¢/kg · %)</th><th>Beneficiamento 75/36<br>(¢/kg · %)</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
 
   <footer>
-    <b>SUPERIA</b> · Inteligência Comercial — Fios e Fibras &nbsp;|&nbsp; Monitor de Gaps · Cadeia Poliéster<br>
-    US$/kg · FOB · benchmark POY HENGYI / Texturizado TONGKUN · Helanca informada · PSF fibra (Xiamen CFR Pecém) · superia.global
+    <b>SUPERIA</b> · Monitor de Gap · Cadeia Poliéster &nbsp;|&nbsp; Texturização = DTY 150/48 NIM − POY 250/48 · Beneficiamento = Helanca Branca − DTY 75/36 NIM<br>
+    ¢/kg sobre base US$/kg FOB · benchmark POY HENGYI / DTY TONGKUN · Helanca PJ0036 (malha 120gsm) · superia.global
   </footer>
 </div>
 
 <script>
-/* ===========================================================
-   BASE DE DADOS — COMO ATUALIZAR
-   pontos: [ ['AAAA-MM-DD', preço], ... ]  (FOB US$/kg, ordem crescente)
-   Novo dia: adicione ['2026-09-04', 1.39] na série certa.
-   =========================================================== */
-// POY 250/48 SD RW por fornecedor (base das duas famílias). Filtro define qual entra no gap.
-const POY250 = {
-  HENGYI:[['2026-07-27',1.13],['2026-08-04',1.12],['2026-08-26',1.16],['2026-09-02',1.22],['2026-09-16',1.28],['2026-09-21',1.28],['2026-09-28',1.24]],
-  TONGKUN:[['2026-08-04',1.13],['2026-09-02',1.19],['2026-09-03',1.25]]
-};
-const SERIES = [
-  // FAMÍLIA 150/48 — POY é derivado (recebe o fornecedor selecionado)
-  {id:'poy150', fam:'150/48', estagio:'POY', label:'POY 250/48 SD RW', forn:'HENGYI', cor:'--poy', derived:true,
-    pontos:POY250.HENGYI.slice()},
-  {id:'t150_NIM', fam:'150/48', estagio:'Texturizado', variante:'NIM', label:'PTY 150/48 NIM', forn:'TONGKUN', text:true, cor:'--text',
-    pontos:[['2026-07-27',1.24],['2026-08-03',1.22],['2026-08-11',1.21],['2026-08-17',1.23],['2026-08-19',1.23],['2026-08-21',1.25],['2026-08-31',1.30],['2026-09-01',1.305],['2026-09-03',1.37],['2026-09-07',1.36],['2026-09-14',1.41],['2026-09-16',1.395],['2026-09-21',1.41],['2026-09-22',1.34],['2026-09-28',1.36]]},
-  {id:'t150_HIM', fam:'150/48', estagio:'Texturizado', variante:'HIM', label:'PTY 150/48 HIM', forn:'TONGKUN', text:true, cor:'--text',
-    pontos:[['2026-07-27',1.30],['2026-08-03',1.28],['2026-08-11',1.27],['2026-08-17',1.29],['2026-08-19',1.29],['2026-08-21',1.31],['2026-08-31',1.36],['2026-09-03',1.43],['2026-09-07',1.42],['2026-09-14',1.47],['2026-09-21',1.46],['2026-09-22',1.40],['2026-09-28',1.42]]},
-  {id:'t150_SIM', fam:'150/48', estagio:'Texturizado', variante:'SIM', label:'PTY 150/48 SIM', forn:'TONGKUN', text:true, cor:'--text',
-    pontos:[['2026-07-27',1.28],['2026-09-03',1.40],['2026-09-07',1.39],['2026-09-14',1.44],['2026-09-21',1.44]]},
+/* ============================================================
+   DADOS — como atualizar: adicione ['AAAA-MM-DD', preço] na série.
+   Preços em US$/kg FOB (ordem crescente de data).
+   ============================================================ */
+const POY    = [['2026-07-27',1.13],['2026-08-04',1.12],['2026-08-26',1.16],['2026-09-02',1.22],['2026-09-16',1.28],['2026-09-21',1.28],['2026-09-28',1.24]];
+const TEX150 = [['2026-07-27',1.24],['2026-08-03',1.22],['2026-08-11',1.21],['2026-08-17',1.23],['2026-08-19',1.23],['2026-08-21',1.25],['2026-08-31',1.30],['2026-09-01',1.305],['2026-09-03',1.37],['2026-09-07',1.36],['2026-09-14',1.41],['2026-09-16',1.395],['2026-09-21',1.41],['2026-09-22',1.34],['2026-09-28',1.36]];
+const TEX75  = [['2026-07-27',1.34],['2026-08-03',1.31],['2026-08-10',1.29],['2026-08-11',1.32],['2026-08-17',1.34],['2026-08-19',1.34],['2026-08-21',1.36],['2026-08-31',1.39],['2026-09-01',1.40],['2026-09-03',1.46],['2026-09-07',1.45],['2026-09-14',1.49],['2026-09-16',1.48],['2026-09-21',1.49],['2026-09-22',1.45],['2026-09-28',1.47]];
+const HELB   = [['2026-08-04',1.62],['2026-08-11',1.66],['2026-08-18',1.62],['2026-08-25',1.60],['2026-09-01',1.78],['2026-09-08',1.95],['2026-09-15',1.79],['2026-09-22',1.84]];
 
-  // FAMÍLIA 75/36
-  {id:'poy75', fam:'75/36', estagio:'POY', label:'POY 250/48 SD RW (base 75/36)', forn:'HENGYI', cor:'--poy', derived:true,
-    pontos:POY250.HENGYI.slice()},
-  {id:'t75_NIM', fam:'75/36', estagio:'Texturizado', variante:'NIM', label:'PTY 75/36 NIM', forn:'TONGKUN', text:true, cor:'--text',
-    pontos:[['2026-07-27',1.34],['2026-08-03',1.31],['2026-08-10',1.29],['2026-08-11',1.32],['2026-08-17',1.34],['2026-08-19',1.34],['2026-08-21',1.36],['2026-08-31',1.39],['2026-09-01',1.40],['2026-09-03',1.46],['2026-09-07',1.45],['2026-09-14',1.49],['2026-09-16',1.48],['2026-09-21',1.49],['2026-09-22',1.45],['2026-09-28',1.47]]},
-  {id:'t75_HIM', fam:'75/36', estagio:'Texturizado', variante:'HIM', label:'PTY 75/36 HIM', forn:'TONGKUN', text:true, cor:'--text',
-    pontos:[['2026-07-27',1.46],['2026-08-11',1.41],['2026-08-17',1.43],['2026-08-19',1.43],['2026-08-21',1.45],['2026-09-03',1.59],['2026-09-07',1.58],['2026-09-14',1.62],['2026-09-21',1.62],['2026-09-22',1.54],['2026-09-28',1.56]]},
-  {id:'t75_SIM', fam:'75/36', estagio:'Texturizado', variante:'SIM', label:'PTY 75/36 SIM', forn:'TONGKUN', text:true, cor:'--text',
-    pontos:[['2026-07-27',1.38],['2026-09-03',1.51],['2026-09-07',1.50],['2026-09-14',1.54],['2026-09-21',1.54]]},
-  {id:'hb75', fam:'75/36', estagio:'Helanca Branca', label:'Helanca 75/36 Branca/Crua (PJ0036, malha 120gsm)', forn:'PJ0036', cor:'--branca',
-    pontos:[['2026-08-04',1.62],['2026-08-11',1.66],['2026-08-18',1.62],['2026-08-25',1.60],['2026-09-01',1.78],['2026-09-08',1.95],['2026-09-15',1.79],['2026-09-22',1.84]]},
-  {id:'ht75', fam:'75/36', estagio:'Helanca Tinta', label:'Helanca 75/36 Tinta/Cores (PJ0036, malha 120gsm)', forn:'PJ0036', cor:'--tinta',
-    pontos:[['2026-08-04',1.71],['2026-08-11',1.76],['2026-08-18',1.72],['2026-08-25',1.76],['2026-09-01',1.88],['2026-09-08',2.05],['2026-09-15',1.89],['2026-09-22',1.92]]},
+// gap 1 = texturização 150/48 (DTY − POY); gap 2 = beneficiamento 75/36 (Helanca − DTY75)
+const GAP1 = {lab:'Texturização · 150/48', flow:'POY 250/48 → DTY 150/48 (NIM)', color:'#57C99A', from:POY, to:TEX150, baseLabel:'POY'};
+const GAP2 = {lab:'Beneficiamento · 75/36', flow:'DTY 75/36 (NIM) → Helanca Branca', color:'#6FB1FF', from:TEX75, to:HELB, baseLabel:'texturizado'};
 
-  // MATÉRIA-PRIMA — POY por fornecedor (comparação)
-  {id:'poyH', fam:'Matéria-prima', estagio:'POY 250/48', label:'POY 250/48 SD RW · HENGYI', forn:'HENGYI', cor:'--poy', pontos:POY250.HENGYI},
-  {id:'poyT', fam:'Matéria-prima', estagio:'POY 250/48', label:'POY 250/48 SD RW · TONGKUN', forn:'TONGKUN', cor:'#8FD3FF', pontos:POY250.TONGKUN},
-  {id:'poy125T', fam:'Matéria-prima', estagio:'POY 125/36', label:'POY 125/36 SD RW · TONGKUN (ref.)', forn:'TONGKUN', cor:'#B7E1C9', ref:true,
-    pontos:[['2026-09-02',1.205],['2026-09-03',1.265]]},
+function valAt(series,date){let v=null;for(const[d,x]of series){if(d<=date)v=x;else break;}return v;}
+function fmtBR(iso){const[y,m,d]=iso.split('-');return d+'/'+m;}
+const allDatesRaw=[...new Set([...POY,...TEX150,...TEX75,...HELB].map(p=>p[0]))].sort();
+const MAXD=allDatesRaw[allDatesRaw.length-1];
 
-  // FIBRA
-  {id:'psf_xfm', fam:'Fibra', estagio:'PSF', label:'PSF 1,2D×32 (XFM, FOB)', forn:'XFM', cor:'--psf',
-    pontos:[['2026-07-23',1.045],['2026-08-17',1.055],['2026-08-18',1.065],['2026-09-04',1.115],['2026-09-09',1.145],['2026-09-10',1.17],['2026-09-14',1.19],['2026-09-15',1.20],['2026-09-16',1.225],['2026-09-20',1.23],['2026-09-23',1.22],['2026-09-28',1.21]]},
-  {id:'psf_hy', fam:'Fibra', estagio:'PSF', label:'PSF 1,2D×32 crua (HENGYI Xiamen, CFR Pecém)', forn:'HENGYI XIAMEN', cor:'--tinta',
-    pontos:[['2026-09-03',1.50]]},
-];
-const S=Object.fromEntries(SERIES.map(s=>[s.id,s]));
-const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-function color(s){let c=s.cor;return c.startsWith('--')?css(c):c;}
-function fmtBR(iso){if(!iso)return'—';const[y,m,d]=iso.split('-');return`${d}/${m}`;}
-function lastPoint(s){return s.pontos.length?s.pontos[s.pontos.length-1]:null;}
-function prevPoint(s){return s.pontos.length>1?s.pontos[s.pontos.length-2]:null;}
-function allDates(ids){const set=new Set();ids.forEach(id=>S[id]&&S[id].pontos.forEach(p=>set.add(p[0])));return[...set].sort();}
-function valAt(s,date){let v=null;for(const[d,val]of s.pontos){if(d<=date)v=val;else break;}return v;}
-
-Chart.defaults.color=css('--mut');
-Chart.defaults.font.family='-apple-system,"Segoe UI",Roboto,Arial,sans-serif';
-Chart.defaults.font.size=11.5;
-const gridClr='rgba(255,255,255,.06)';
-const scales=()=>({x:{grid:{color:gridClr},ticks:{maxRotation:0,autoSkip:true}},y:{grid:{color:gridClr},ticks:{callback:v=>v.toFixed(2)}}});
-
-function priceChart(cid,ids){
-  const dates=allDates(ids);
-  const ds=ids.map(id=>{const s=S[id];if(!s)return null;const c=color(s);
-    return{label:s.variante?`${s.estagio} (${s.variante})`:s.estagio,data:dates.map(d=>valAt(s,d)),
-      borderColor:c,backgroundColor:c,borderWidth:s.ref?1.5:2.4,borderDash:s.ref?[5,4]:[],
-      pointRadius:3,pointHoverRadius:5,spanGaps:true,tension:.15};}).filter(Boolean);
-  return new Chart(document.getElementById(cid),{type:'line',data:{labels:dates.map(fmtBR),datasets:ds},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{legend:{labels:{boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'line'}},
-        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y==null?'—':'US$ '+c.parsed.y.toFixed(3)}`}}},scales:scales()}});
-}
-function gapChart(cid,gaps){
-  const ids=gaps.flatMap(g=>[g.from,g.to]);const dates=allDates(ids);
-  const ds=gaps.map(g=>{const c=g.color;
-    return{label:g.label,data:dates.map(d=>{const a=valAt(S[g.to],d),b=valAt(S[g.from],d);return(a!=null&&b!=null)?+(a-b).toFixed(3):null;}),
-      borderColor:c,backgroundColor:c+'26',borderWidth:2.4,fill:true,pointRadius:3,pointHoverRadius:5,spanGaps:true,tension:.15};});
-  return new Chart(document.getElementById(cid),{type:'line',data:{labels:dates.map(fmtBR),datasets:ds},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{legend:{labels:{boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'line'}},
-        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y==null?'—':'US$ '+c.parsed.y.toFixed(3)+'/kg'}`}}},scales:scales()}});
-}
-function normChart(cid,ids){
-  const dates=allDates(ids);
-  const ds=ids.map(id=>{const s=S[id];const c=color(s);
-    let base=null;for(const d of dates){const v=valAt(s,d);if(v!=null){base=v;break;}}
-    return{label:s.label.replace(/\(.*/,'').trim(),data:dates.map(d=>{const v=valAt(s,d);return v!=null&&base?+(v/base*100).toFixed(1):null;}),
-      borderColor:c,backgroundColor:c,borderWidth:2.2,pointRadius:2,pointHoverRadius:5,spanGaps:true,tension:.15};});
-  return new Chart(document.getElementById(cid),{type:'line',data:{labels:dates.map(fmtBR),datasets:ds},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{legend:{labels:{boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'line'}},
-        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y==null?'—':c.parsed.y+' (base 100)'}`}}},
-      scales:{x:{grid:{color:gridClr}},y:{grid:{color:gridClr},ticks:{callback:v=>v}}}}});
+// gap value (¢) and % at a date; keyDates = where the "to" leg has readings
+function gapArr(g){
+  const dates=[...new Set(g.to.map(p=>p[0]))].sort();
+  return dates.map(d=>{const a=valAt(g.to,d),b=valAt(g.from,d);
+    if(a==null||b==null)return null;
+    return {date:d, cents:Math.round((a-b)*100), pct:(a-b)/b*100};}).filter(Boolean);
 }
 
-const state={ref150:'t150_NIM',ref75:'t75_NIM',poySup:'HENGYI'};let ch={};
-const tvars=fam=>SERIES.filter(s=>s.fam===fam&&s.text);
-function fillSel(id,fam,cur){const sel=document.getElementById(id);sel.innerHTML='';
-  tvars(fam).forEach(s=>{const o=document.createElement('option');o.value=s.id;
-    o.textContent=s.variante+(lastPoint(s)?` — US$ ${lastPoint(s)[1].toFixed(3)}`:'');if(s.id===cur)o.selected=true;sel.appendChild(o);});}
-
-const ids150=()=>['poy150',state.ref150];
-const ids75=()=>['poy75',state.ref75,'hb75','ht75'];
-const gaps150=()=>[{label:'Gap texturização',from:'poy150',to:state.ref150,color:css('--text')}];
-const gaps75=()=>[
-  {label:'Texturização (text.−POY)',from:'poy75',to:state.ref75,color:css('--text')},
-  {label:'Beneficiamento (branca−text.)',from:state.ref75,to:'hb75',color:css('--poy')},
-  {label:'Tingimento (tinta−branca)',from:'hb75',to:'ht75',color:css('--tinta')},
-];
-const idsNorm=()=>['poy150',state.ref150,state.ref75];
-const idsRaw=()=>['poyH','poyT','poy125T','psf_xfm','psf_hy'];
-function applyPoySup(){
-  const pts=POY250[state.poySup]||POY250.HENGYI;
-  ['poy150','poy75'].forEach(id=>{ S[id].pontos=pts; S[id].forn=state.poySup; });
+const state={mode:'all',d1:null,d2:null};
+function inRange(d){
+  if(state.d1&&d<state.d1)return false;
+  if(state.d2&&d>state.d2)return false;
+  if(state.mode==='30'||state.mode==='90'){
+    const n=+state.mode, cut=new Date(MAXD); cut.setDate(cut.getDate()-n);
+    const ci=cut.toISOString().slice(0,10);
+    if(d<ci)return false;
+  }
+  return true;
 }
 
+let chart;
 function render(){
-  if(typeof Chart==='undefined'){document.querySelectorAll('.chart-box').forEach(b=>b.innerHTML='<div style="color:var(--mut);padding:20px;text-align:center;font-size:12px">Gráfico requer internet (Chart.js). KPIs e tabela funcionam.</div>');return;}
-  Object.values(ch).forEach(c=>c&&c.destroy());
-  ch.p150=priceChart('c150p',ids150());ch.g150=gapChart('c150g',gaps150());
-  ch.p75=priceChart('c75p',ids75());ch.g75=gapChart('c75g',gaps75());
-  ch.norm=normChart('cnorm',idsNorm());ch.raw=priceChart('craw',idsRaw());
-}
+  const a1=gapArr(GAP1).filter(x=>inRange(x.date));
+  const a2=gapArr(GAP2).filter(x=>inRange(x.date));
+  document.getElementById('lastUpd').textContent=MAXD?fmtBR(MAXD)+'/'+MAXD.slice(0,4):'—';
 
-function kpi(cont,{lab,from,to,color}){
-  const a=S[to],b=S[from],la=lastPoint(a);
-  const lbv=la?valAt(b,la[0]):null;               // preço do estágio anterior NA MESMA data
-  const card=document.createElement('div');card.className='kpi';
-  const bar=document.createElement('div');bar.className='bar';bar.style.background=color;card.appendChild(bar);
-  let h=`<div class="lab">${lab}</div>`;
-  if(!la||lbv==null){card.classList.add('empty');h+=`<div class="val">—</div><div class="meta miss">aguardando ${lbv==null?b.estagio:a.estagio}</div>`;}
-  else{const gap=+(la[1]-lbv).toFixed(3),pct=gap/lbv*100;
-    let dtxt='1ª leitura',dc='flat';
-    const pa=prevPoint(a),pbv=pa?valAt(b,pa[0]):null;
-    if(pa&&pbv!=null){const pgap=+(pa[1]-pbv).toFixed(3);const dd=+(gap-pgap).toFixed(3);
-      if(dd>0.0005){dc='up';dtxt='▲ +'+dd.toFixed(3)+'/kg'}else if(dd<-0.0005){dc='down';dtxt='▼ '+dd.toFixed(3)+'/kg'}else{dtxt='→ estável'}}
-    h+=`<div class="val">US$ ${gap.toFixed(3)} <small>/kg</small></div>
-      <div class="meta"><span class="pct" style="color:${color}">${pct.toFixed(1)}%</span> sobre ${b.estagio} · ${fmtBR(la[0])}</div>
-      <div class="delta ${dc}">${dtxt}</div>`;}
-  card.innerHTML+=h;cont.appendChild(card);
-}
-function buildKPIs(){const c=document.getElementById('kpis');c.innerHTML='';
-  kpi(c,{lab:'150/48 · Texturização',from:'poy150',to:state.ref150,color:css('--text')});
-  kpi(c,{lab:'75/36 · Texturização',from:'poy75',to:state.ref75,color:css('--text')});
-  kpi(c,{lab:'75/36 · Beneficiamento',from:state.ref75,to:'hb75',color:css('--poy')});
-  kpi(c,{lab:'75/36 · Tingimento',from:'hb75',to:'ht75',color:css('--tinta')});
-}
-function buildTable(){const tb=document.querySelector('#dataTable tbody');tb.innerHTML='';
-  SERIES.filter(s=>!s.derived).forEach(s=>{const lp=lastPoint(s),pp=prevPoint(s);
-    let d30='—',cls='';if(lp&&pp){const dd=+(lp[1]-pp[1]).toFixed(3);cls=dd>0?'up-n':dd<0?'down-n':'';d30=(dd>0?'+':'')+dd.toFixed(3);}
+  // KPIs
+  const kc=document.getElementById('kpis');kc.innerHTML='';
+  [[GAP1,a1],[GAP2,a2]].forEach(([g,arr])=>{
+    const cur=arr[arr.length-1], prev=arr[arr.length-2];
+    const card=document.createElement('div');card.className='kpi';
+    let dtxt='—',dc='flat';
+    if(cur&&prev){const dd=cur.cents-prev.cents;
+      if(dd>0){dc='up';dtxt='▲ +'+dd+' ¢ vs leitura anterior';}
+      else if(dd<0){dc='down';dtxt='▼ '+dd+' ¢ vs leitura anterior';}
+      else{dtxt='→ estável vs leitura anterior';}}
+    card.innerHTML=
+      '<div class="bar" style="background:'+g.color+'"></div>'+
+      '<div class="lab">'+g.lab+'</div>'+
+      '<div class="flow">'+g.flow+'</div>'+
+      (cur?('<div class="big">'+cur.cents+' <small>¢/kg</small></div>'+
+        '<div class="pct" style="color:'+g.color+'">'+cur.pct.toFixed(1)+'% sobre '+g.baseLabel+'</div>'+
+        '<div class="meta">leitura de '+fmtBR(cur.date)+'/'+cur.date.slice(0,4)+'</div>'+
+        '<div class="delta '+dc+'">'+dtxt+'</div>')
+       :'<div class="big" style="font-size:22px;color:var(--mut)">sem dado no período</div>');
+    kc.appendChild(card);
+  });
+
+  // chart (eixo x = união das datas dos dois gaps no período)
+  const axis=[...new Set([...a1.map(x=>x.date),...a2.map(x=>x.date)])].sort();
+  const m1=Object.fromEntries(a1.map(x=>[x.date,x.cents]));
+  const m2=Object.fromEntries(a2.map(x=>[x.date,x.cents]));
+  if(typeof Chart!=='undefined'){
+    if(chart)chart.destroy();
+    chart=new Chart(document.getElementById('chart'),{type:'line',
+      data:{labels:axis.map(fmtBR),datasets:[
+        {label:'Texturização 150/48',data:axis.map(d=>d in m1?m1[d]:null),borderColor:GAP1.color,backgroundColor:GAP1.color+'22',borderWidth:2.6,pointRadius:3,pointHoverRadius:5,spanGaps:true,tension:.15,fill:true},
+        {label:'Beneficiamento 75/36',data:axis.map(d=>d in m2?m2[d]:null),borderColor:GAP2.color,backgroundColor:GAP2.color+'22',borderWidth:2.6,pointRadius:3,pointHoverRadius:5,spanGaps:true,tension:.15,fill:true},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+        plugins:{legend:{labels:{color:'#9FC4B6',boxWidth:12,boxHeight:12,usePointStyle:true,pointStyle:'line'}},
+          tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+(c.parsed.y==null?'—':c.parsed.y+' ¢/kg')}}},
+        scales:{x:{grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#9FC4B6',maxRotation:0,autoSkip:true}},
+          y:{grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#9FC4B6',callback:v=>v+'¢'}}}}});
+  }else{
+    document.querySelector('.chart-box').innerHTML='<div style="color:var(--mut);padding:20px;text-align:center;font-size:12px">Gráfico requer internet (Chart.js). KPIs e tabela funcionam.</div>';
+  }
+
+  // tabela
+  const tb=document.querySelector('#tbl tbody');tb.innerHTML='';
+  [...axis].reverse().forEach(d=>{
+    const g1=a1.find(x=>x.date===d), g2=a2.find(x=>x.date===d);
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${s.fam}</td>
-      <td><span class="pill" style="border-color:${color(s)}55;color:${color(s)}">${s.estagio}${s.variante?' · '+s.variante:''}</span></td>
-      <td>${s.label}</td><td>${s.forn}</td>
-      <td class="num">${lp?lp[1].toFixed(3):'<span class="miss">—</span>'}</td>
-      <td class="num ${cls}">${lp?d30:''}</td>
-      <td>${lp?fmtBR(lp[0])+'/'+lp[0].slice(0,4):'<span class="miss">pendente</span>'}</td>`;
-    tb.appendChild(tr);});
-  const maxd=SERIES.flatMap(s=>s.pontos.map(p=>p[0])).sort().pop();
-  document.getElementById('lastUpd').textContent=maxd?fmtBR(maxd)+'/'+maxd.slice(0,4):'—';
+    tr.innerHTML='<td>'+fmtBR(d)+'/'+d.slice(0,4)+'</td>'+
+      '<td>'+(g1?'<span class="c1">'+g1.cents+' ¢</span> · '+g1.pct.toFixed(1)+'%':'—')+'</td>'+
+      '<td>'+(g2?'<span class="c2">'+g2.cents+' ¢</span> · '+g2.pct.toFixed(1)+'%':'—')+'</td>';
+    tb.appendChild(tr);
+  });
 }
 
-fillSel('sel150','150/48',state.ref150);fillSel('sel75','75/36',state.ref75);
-document.getElementById('sel150').addEventListener('change',e=>{state.ref150=e.target.value;buildKPIs();render();});
-document.getElementById('sel75').addEventListener('change',e=>{state.ref75=e.target.value;buildKPIs();render();});
-document.getElementById('selPoy').addEventListener('change',e=>{state.poySup=e.target.value;applyPoySup();buildKPIs();buildTable();render();});
-applyPoySup();buildTable();buildKPIs();render();
+// filtro: botões
+document.getElementById('seg').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  [...document.querySelectorAll('#seg button')].forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');state.mode=b.dataset.p;state.d1=null;state.d2=null;
+  document.getElementById('d1').value='';document.getElementById('d2').value='';render();
+});
+// filtro: datas
+document.getElementById('apply').addEventListener('click',()=>{
+  const v1=document.getElementById('d1').value,v2=document.getElementById('d2').value;
+  state.d1=v1||null;state.d2=v2||null;
+  if(v1||v2){state.mode='range';[...document.querySelectorAll('#seg button')].forEach(x=>x.classList.remove('active'));}
+  render();
+});
+document.getElementById('clear').addEventListener('click',()=>{
+  state.mode='all';state.d1=null;state.d2=null;
+  document.getElementById('d1').value='';document.getElementById('d2').value='';
+  [...document.querySelectorAll('#seg button')].forEach(x=>x.classList.toggle('active',x.dataset.p==='all'));render();
+});
+
+render();
 </script>
 </body>
 </html>
